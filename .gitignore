@@ -2,4 +2,3 @@
 /cmake-build-debug/
 /rust/.idea/
 /rust/Cargo.lock
-/rust/Cargo.toml
