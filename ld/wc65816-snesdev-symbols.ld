@@ -15,6 +15,10 @@ SECTIONS{
 	__div_q = 0x4214;
 	__div_r = 0x4216;
 
+	__dma_data = 0x4300;
+	__dma_enable = 0x420b;
+	__hdma_enable = 0x420c;
+
 	.extreg ALIGN(32768){
 		_Fault = 0x00F0;
 		_FaultCode = 0x00F0;

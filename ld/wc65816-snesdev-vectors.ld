@@ -2,9 +2,9 @@ SECTIONS {
 	section ALIGN(32768) .text.init{
 		__start_init = .;
 		*(.text.init);
-		. = __start_init + 0x7fc0;
+		. = 0x7fc0;
 		*(.text.init.desc);
-		. = __start_init + 0x7fe0;
+		. = 0x7fe0;
 		FILL(0xFFFF);
 		SHORT(__native_cop);
 		SHORT(__native_brk);

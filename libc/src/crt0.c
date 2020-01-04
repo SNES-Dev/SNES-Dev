@@ -20,10 +20,12 @@ static void _start() __attribute__((section(".text.init")));
 void _Reset() __attribute__((section(".text.init"),naked));
 
 void _Reset() __attribute__((emulation)) {
-    __asm__("SEI");
-    __asm__("LEA __stack_begin");
-    __asm__("TAS");
-    __asm__("JMP _start");
+    __asm__ __volatile__("SEI");
+    __asm__ __volatile__("CLC");
+    __asm__ __volatile__("XCE");
+    __asm__ __volatile__("LEA __stack_begin");
+    __asm__ __volatile__("TAS");
+    __asm__ __volatile__("JMP _start");
     __builtin_unreachable();
 }
 

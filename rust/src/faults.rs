@@ -7,7 +7,7 @@ use core::mem::MaybeUninit;
 use core::cell::UnsafeCell;
 
 #[repr(C,u16)]
-#[derive(Copy,Clone)]
+#[derive(Copy,Clone,Default)]
 enum FaultCode{
     Ok = 0,
     Panic = 1,
@@ -90,7 +90,7 @@ enum FaultTrigger{
 }
 
 #[repr(C,packed)]
-#[derive(Copy,Clone)]
+#[derive(Copy,Clone,Default)]
 struct Fault(pub FaultCode,pub MaybeUninit<*mut ()>);
 
 extern "C"{
@@ -104,21 +104,21 @@ extern "C"{
 
 pub fn set_fault_handler(handler: *fn (Fault)->()){
     unsafe{
-        asm!["SEI"];
+        asm!("SEI"::::"volatile");
         _FaultHandler = Some(handler);
-        asm!["CLI"];
+        asm!("CLI"::::"volatile");
     }
 }
 
 pub fn raise(f: Fault) -> (){
     unsafe{
-        asm!["SEI"];
+        asm!("SEI");
         loop {
             core::intrinsics::volatile_store(&mut _Fault.1 as *mut MaybeUninit<*mut ()>, f.1);
-            asm!["CLI"];
+            asm!("CLI"::::"volatile");
             core::intrinsics::volatile_store(&mut _Fault.0 as *mut FaultCode, f.0);
             if let FaultTrigger::Async = _FaultTriggered.load() {
-                asm!["SEI"];
+                asm!("SEI"::::"volatile");
                 continue;
             }else{
                 break;

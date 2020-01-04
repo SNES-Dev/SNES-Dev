@@ -26,3 +26,29 @@ impl<T: Copy> VolatileCell<T>{
         }
     }
 }
+#[repr(transparent)]
+struct AtomicCell<T: Copy>{
+    cell: UnsafeCell<T>
+}
+
+unsafe impl<T: Copy> Send for AtomicCell<T>{}
+unsafe impl<T: Copy> Sync for AtomicCell<T>{}
+
+impl<T: Copy> AtomicCell<T>{
+    pub fn load(&self) -> T{
+        unsafe{
+            asm!("SEI"::::"volatile");
+            let val = core::intrinsics::volatile_load(self.cell.get());
+            asm!("CLI"::::"volatile");
+            val
+        }
+    }
+
+    pub fn store(&self,val: T) -> (){
+        unsafe{
+            asm!("SEI"::::"volatile");
+            core::intrinsics::volatile_store(self.cell.get(),val);
+            asm!("CLI"::::"volatile");
+        }
+    }
+}
