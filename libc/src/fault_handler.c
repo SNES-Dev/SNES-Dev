@@ -4,7 +4,9 @@
 
 #include <snes_dev/Fault.h>
 
-static fault_handler* _FaultHandler;
+void __default_fault_handler(Fault fault) __attribute__((weak));
+
+static fault_handler* _FaultHandler = __default_fault_handler;
 
 void set_fault_handler(fault_handler* handler){
     __asm__ volatile("SEI");
@@ -12,7 +14,7 @@ void set_fault_handler(fault_handler* handler){
     __asm__ volatile("CLI");
 }
 
-__attribute__((interrupt,section(".text.init"))) void __native_irq(){
+__attribute__((convention(interrupt),section(".text.init"))) void __native_irq(void){
     Fault f = _Fault;
     if(_FaultHandler)
         _FaultHandler(f);

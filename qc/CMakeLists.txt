@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(qc C)
 
-set(CMAKE_C_STANDARD C99)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_COMPILER_TARGET wc65816-snesdev-snes)
 set(CMAKE_ASM_COMPILER_TARGET wc65816-snesdev-snes)
