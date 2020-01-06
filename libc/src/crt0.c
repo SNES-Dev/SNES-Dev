@@ -17,9 +17,8 @@ extern void main();
 
 static void _start() __attribute__((section(".text.init")));
 
-void _Reset() __attribute__((section(".text.init"),naked));
 
-void _Reset() __attribute__((emulation)) {
+__attribute__((emulation,section(".text.init"),naked)) void _Reset()  {
     __asm__ __volatile__("SEI");
     __asm__ __volatile__("CLC");
     __asm__ __volatile__("XCE");

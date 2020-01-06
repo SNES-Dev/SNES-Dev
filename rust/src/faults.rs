@@ -1,4 +1,3 @@
-#![allow(non_upper_case_globals)]
 
 use crate::volatile::*;
 
@@ -95,12 +94,14 @@ struct Fault(pub FaultCode,pub MaybeUninit<*mut ()>);
 
 extern "C"{
     #[no_mangle]
-    static mut _Fault: Fault;
+    static _Fault: AtomicCell<Fault>;
+
     #[no_mangle]
     static mut _FaultHandler: Option<*fn (Fault)->()>;
     #[no_mangle]
-    static _FaultTriggered: VolatileCell<FaultTrigger>;
+    static _FaultTriggered: AtomicCell<FaultTrigger>;
 }
+
 
 pub fn set_fault_handler(handler: *fn (Fault)->()){
     unsafe{
@@ -110,20 +111,13 @@ pub fn set_fault_handler(handler: *fn (Fault)->()){
     }
 }
 
-pub fn raise(f: Fault) -> (){
-    unsafe{
-        asm!("SEI");
-        loop {
-            core::intrinsics::volatile_store(&mut _Fault.1 as *mut MaybeUninit<*mut ()>, f.1);
-            asm!("CLI"::::"volatile");
-            core::intrinsics::volatile_store(&mut _Fault.0 as *mut FaultCode, f.0);
-            if let FaultTrigger::Async = _FaultTriggered.load() {
-                asm!("SEI"::::"volatile");
-                continue;
-            }else{
-                break;
-            }
-            //This is sufficient to trigger an IRQ.
+pub unsafe fn raise(f: Fault) -> (){
+    loop {
+        _Fault.store(f);
+        if let FaultTrigger::Async = _FaultTriggered.load(){
+            continue;
+        }else{
+            break;
         }
     }
 }

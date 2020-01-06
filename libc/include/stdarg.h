@@ -12,8 +12,10 @@ typedef struct{
 
 typedef __va_list va_list[1];
 
-void __va_start(__va_list* list,void* start,)
 
-#define va_start(list,param)
+#define va_start(list,param) (list[0].__arg_base = &param+1,list[0].__cur_arg = &param+1)
+#define va_copy(list,to) (list[0] = to[0])
+#define va_end(list)
+#define va_arg(list,T) *((T*)list[0].__arg_base)++
 
 #endif //SNES_DEV_STDARG_H

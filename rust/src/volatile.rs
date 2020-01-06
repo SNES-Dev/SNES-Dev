@@ -27,7 +27,7 @@ impl<T: Copy> VolatileCell<T>{
     }
 }
 #[repr(transparent)]
-struct AtomicCell<T: Copy>{
+pub(crate) struct AtomicCell<T: Copy>{
     cell: UnsafeCell<T>
 }
 

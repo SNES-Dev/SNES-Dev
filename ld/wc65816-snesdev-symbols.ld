@@ -2,6 +2,7 @@ SECTIONS{
 	__screen_display = 0x2100;
 	__counter_enable = 0x4200;
 
+	__joypads = 0x4218;
 	__joypad1 = 0x4218;
 	__joypad2 = 0x421a;
 	__joypad3 = 0x421c;
