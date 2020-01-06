@@ -15,7 +15,3 @@ add_subdirectory(qc)
 add_subdirectory(libc)
 add_subdirectory(llvm-project/llvm)
 
-set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES libc/include)
-include_directories(qc/include libc/include include)
-
-add_library(snes_dev STATIC library.c library.h include/snes_dev/Fault.h include/snes_dev/variables.h include/memctl/devices.h)
