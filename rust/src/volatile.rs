@@ -1,4 +1,8 @@
 use core::cell::UnsafeCell;
+use core::mem::MaybeUninit;
+use core::panicking::panic;
+use core::ops::Index;
+use crate::LockInterrupts;
 
 ///
 /// Represents a volatile value in memory
@@ -32,10 +36,10 @@ impl<T: Copy> VolatileCell<MaybeUninit<T>>{
 		unsafe{core::intrinsics::volatile_store((*self.cell.get()).as_mut_ptr(),val)};
 	}
 	pub unsafe fn load_value(&self)->T{
-		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr()))
+		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr())
 	}
 	pub fn zero(&self){
-		unsafe{core::intrinsics::volatile_store(self.cell.get(),)}
+		unsafe{core::intrinsics::volatile_store(self.cell.get(),MaybeUninit::zeroed())}
 	}
 }
 
@@ -53,18 +57,18 @@ impl<T: Copy,Size: usize> VolatileCell<[T;Size]>{
 			panic!("Cannot index array of size {} at {}",Size,idx);
 		}
 		unsafe{
-			core::intrinsics::volatile_store(core::intrinsics::offset(self.cell.get() as *mut T,idx),val)
+			core::intrinsics::volatile_store(core::intrinsics::offset(self.cell.get() as *mut T,idx) as *mut T,val)
 		}
 	}
 }
 
 impl<T: Copy,Size: usize> Index<isize> for VolatileCell<[T;Size]>{
 	type Output = VolatileCell<T>;
-	pub fn index(&self,idx: isize) -> &Self::Output{
+	fn index(&self,idx: isize) -> &Self::Output{
 		if idx >= Size || idx<0{
 			panic!("Cannot index array of size {} at {}",Size,idx);
 		}
-		unsafe{ &*core::intrinsics::offset(self.cell.get() as *T,idx) as *Self::Output}
+		unsafe{ core::intrinsics::offset(self.cell.get() as *T,idx) as &Self::Output}
 	}
 }
 
@@ -102,11 +106,11 @@ impl<T: Copy> AtomicCell<MaybeUninit<T>>{
 	}
 	pub unsafe fn load_value(&self)->T{
 		let lock = LockInterrupts::new();
-		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr()))
+		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr())
 	}
 	pub fn zero(&self){
 		let lock = LockInterrupts::new();
-		unsafe{core::intrinsics::volatile_store(self.cell.get(),)}
+		unsafe{core::intrinsics::volatile_store(self.cell.get(),MaybeUninit::zeroed())}
 	}
 }
 
@@ -126,18 +130,18 @@ impl<T: Copy,Size: usize> AtomicCell<[T;Size]>{
 		}
 		let lock = LockInterrupts::new();
 		unsafe{
-			core::intrinsics::volatile_store(core::intrinsics::offset(self.cell.get() as *mut T,idx),val)
+			core::intrinsics::volatile_store(core::intrinsics::offset(self.cell.get() as *mut T,idx) as *mut T,val)
 		}
 	}
 }
 
 impl<T: Copy,Size: usize> Index<isize> for AtomicCell<[T;Size]>{
 	type Output = AtomicCell<T>;
-	pub fn index(&self,idx: isize) -> &AtomicCell<T>{
+	fn index(&self,idx: isize) -> &AtomicCell<T>{
 		if idx >= Size || idx<0{
 			panic!("Cannot index array of size {} at {}",Size,idx);
 		}
-		unsafe{ &*core::intrinsics::offset(self.cell.get() as *T,idx) as *AtomicCell<T>}
+		unsafe{ core::intrinsics::offset(self.cell.get() as *T,idx) as &AtomicCell<T>}
 	}
 }
 
