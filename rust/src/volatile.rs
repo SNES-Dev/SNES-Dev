@@ -26,6 +26,48 @@ impl<T: Copy> VolatileCell<T>{
         }
     }
 }
+
+impl<T: Copy> VolatileCell<MaybeUninit<T>>{
+	pub fn store_value(&self,val: T){
+		unsafe{core::intrinsics::volatile_store((*self.cell.get()).as_mut_ptr(),val)};
+	}
+	pub unsafe fn load_value(&self)->T{
+		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr()))
+	}
+	pub fn zero(&self){
+		unsafe{core::intrinsics::volatile_store(self.cell.get(),)}
+	}
+}
+
+impl<T: Copy,Size: usize> VolatileCell<[T;Size]>{
+	pub fn load_at(&self,idx: isize) -> T{
+		if idx >= Size || idx<0{
+			panic!("Cannot index array of size {} at {}",Size,idx);
+		}
+		unsafe{
+			core::intrinsics::volatile_load(core::intrinsics::offset(self.cell.get() as *T,idx))
+		}
+	}
+	pub fn store_at(&self,idx: isize,val: T){
+		if idx >= Size || idx<0{
+			panic!("Cannot index array of size {} at {}",Size,idx);
+		}
+		unsafe{
+			core::intrinsics::volatile_store(core::intrinsics::offset(self.cell.get() as *mut T,idx),val)
+		}
+	}
+}
+
+impl<T: Copy,Size: usize> Index<isize> for VolatileCell<[T;Size]>{
+	type Output = VolatileCell<T>;
+	pub fn index(&self,idx: isize) -> &Self::Output{
+		if idx >= Size || idx<0{
+			panic!("Cannot index array of size {} at {}",Size,idx);
+		}
+		unsafe{ &*core::intrinsics::offset(self.cell.get() as *T,idx) as *Self::Output}
+	}
+}
+
 #[repr(transparent)]
 pub(crate) struct AtomicCell<T: Copy>{
     cell: UnsafeCell<T>
@@ -52,3 +94,50 @@ impl<T: Copy> AtomicCell<T>{
         }
     }
 }
+
+impl<T: Copy> AtomicCell<MaybeUninit<T>>{
+	pub fn store_value(&self,val: T){
+		let lock = LockInterrupts::new();
+		unsafe{core::intrinsics::volatile_store((*self.cell.get()).as_mut_ptr(),val)};
+	}
+	pub unsafe fn load_value(&self)->T{
+		let lock = LockInterrupts::new();
+		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr()))
+	}
+	pub fn zero(&self){
+		let lock = LockInterrupts::new();
+		unsafe{core::intrinsics::volatile_store(self.cell.get(),)}
+	}
+}
+
+impl<T: Copy,Size: usize> AtomicCell<[T;Size]>{
+	pub fn load_at(&self,idx: isize) -> T{
+		if idx >= Size || idx<0{
+			panic!("Cannot index array of size {} at {}",Size,idx);
+		}
+		let lock = LockInterrupts::new();
+		unsafe{
+			core::intrinsics::volatile_load(core::intrinsics::offset(self.cell.get() as *T,idx))
+		}
+	}
+	pub fn store_at(&self,idx: isize,val: T){
+		if idx >= Size || idx<0{
+			panic!("Cannot index array of size {} at {}",Size,idx);
+		}
+		let lock = LockInterrupts::new();
+		unsafe{
+			core::intrinsics::volatile_store(core::intrinsics::offset(self.cell.get() as *mut T,idx),val)
+		}
+	}
+}
+
+impl<T: Copy,Size: usize> Index<isize> for AtomicCell<[T;Size]>{
+	type Output = AtomicCell<T>;
+	pub fn index(&self,idx: isize) -> &AtomicCell<T>{
+		if idx >= Size || idx<0{
+			panic!("Cannot index array of size {} at {}",Size,idx);
+		}
+		unsafe{ &*core::intrinsics::offset(self.cell.get() as *T,idx) as *AtomicCell<T>}
+	}
+}
+

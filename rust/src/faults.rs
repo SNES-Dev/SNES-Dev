@@ -7,7 +7,7 @@ use core::cell::UnsafeCell;
 
 #[repr(C,u16)]
 #[derive(Copy,Clone,Default)]
-enum FaultCode{
+pub enum FaultCode{
     Ok = 0,
     Panic = 1,
     WriteViolation = 0x10,
@@ -90,7 +90,7 @@ enum FaultTrigger{
 
 #[repr(C,packed)]
 #[derive(Copy,Clone,Default)]
-struct Fault(pub FaultCode,pub MaybeUninit<*mut ()>);
+pub struct Fault(pub FaultCode,pub MaybeUninit<*mut ()>);
 
 extern "C"{
     #[no_mangle]
@@ -124,7 +124,7 @@ pub unsafe fn raise(f: Fault) -> (){
 
 pub fn halt() -> !{
     unsafe{
-        raise(Fault(FaultCode::Panic,MaybeUninit::uninit()));
+		raise(Fault(FaultCode::Panic,MaybeUninit::uninit()));
         core::intrinsics::unreachable()
     }
 }

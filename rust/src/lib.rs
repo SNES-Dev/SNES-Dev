@@ -7,8 +7,27 @@
 #[cfg(not(target="wc65c816"))]
 compile_error!("Can only build snes-dev rust for the 65816 architecture");
 
+static mut _DISABLE_INTERRUPTS: u16 = 0;
 
+pub struct LockInterrupts{}
 
+impl LockInterrupts{
+	pub fn new() -> LockInterrupts{
+		unsafe{
+			asm!("SEI"::::"volatile");
+			_DISABLE_INTERRUPTS += 1;
+		}
+	}
+}
+
+impl Drop for LockInterrupts{
+	fn drop(&mut self){
+		_DISABLE_INTERRUPTS -= 1;
+		if _DISABLE_INTERRUPTS==0{
+			asm!("CLI"::::"volatile");
+		}
+	}
+}
 
 
 pub mod variables;

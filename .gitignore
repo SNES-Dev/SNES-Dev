@@ -2,3 +2,4 @@
 /cmake-build-debug/
 /rust/.idea/
 /rust/Cargo.lock
+/build/
