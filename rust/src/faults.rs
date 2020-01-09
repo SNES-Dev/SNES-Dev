@@ -123,8 +123,8 @@ pub unsafe fn raise(f: Fault) -> (){
 }
 
 pub fn halt() -> !{
-    raise(Fault(FaultCode::Panic,MaybeUninit::uninit()));
     unsafe{
+        raise(Fault(FaultCode::Panic,MaybeUninit::uninit()));
         core::intrinsics::unreachable()
     }
 }
