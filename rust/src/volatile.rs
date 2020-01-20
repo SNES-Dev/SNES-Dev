@@ -3,6 +3,7 @@ use core::mem::MaybeUninit;
 use core::panicking::panic;
 use core::ops::Index;
 use crate::LockInterrupts;
+use core::sync::atomic::{Ordering, compiler_fence};
 
 ///
 /// Represents a volatile value in memory
@@ -82,19 +83,16 @@ unsafe impl<T: Copy> Sync for AtomicCell<T>{}
 
 impl<T: Copy> AtomicCell<T>{
     pub fn load(&self) -> T{
+		let lock = LockInterrupts::new();
         unsafe{
-            asm!("SEI"::::"volatile");
-            let val = core::intrinsics::volatile_load(self.cell.get());
-            asm!("CLI"::::"volatile");
-            val
+            core::intrinsics::volatile_load(self.cell.get())
         }
     }
 
     pub fn store(&self,val: T) -> (){
+		let lock = LockInterrupts::new();
         unsafe{
-            asm!("SEI"::::"volatile");
             core::intrinsics::volatile_store(self.cell.get(),val);
-            asm!("CLI"::::"volatile");
         }
     }
 }

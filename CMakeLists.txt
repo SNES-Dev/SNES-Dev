@@ -13,5 +13,4 @@ set(LLVM_ENABLE_PROJECTS "llvm;lld;clang;compiler-rt")
 SET(CMAKE_C_STANDARD 99)
 add_subdirectory(qc)
 add_subdirectory(libc)
-add_subdirectory(llvm-project/llvm)
 

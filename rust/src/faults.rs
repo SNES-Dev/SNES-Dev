@@ -4,6 +4,8 @@ use crate::volatile::*;
 #[feature(core_intrinsics)]
 use core::mem::MaybeUninit;
 use core::cell::UnsafeCell;
+use crate::LockInterrupts;
+use core::sync::atomic::{compiler_fence, Ordering};
 
 #[repr(C,u16)]
 #[derive(Copy,Clone,Default)]
@@ -104,19 +106,20 @@ extern "C"{
 
 
 pub fn set_fault_handler(handler: *fn (Fault)->()){
+    let lock = LockInterrupts::new();
     unsafe{
-        asm!("SEI"::::"volatile");
         _FaultHandler = Some(handler);
-        asm!("CLI"::::"volatile");
     }
 }
 
 pub unsafe fn raise(f: Fault) -> (){
     loop {
         _Fault.store(f);
+        asm!("WAI"::::"volatile");
         if let FaultTrigger::Async = _FaultTriggered.load(){
             continue;
         }else{
+            compiler_fence(Ordering::SeqCst);
             break;
         }
     }
