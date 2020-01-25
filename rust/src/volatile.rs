@@ -1,7 +1,7 @@
 use core::cell::UnsafeCell;
 use core::mem::MaybeUninit;
 use core::panicking::panic;
-use core::ops::Index;
+use core::ops::{Index, Deref};
 use crate::LockInterrupts;
 use core::sync::atomic::{Ordering, compiler_fence};
 
@@ -39,6 +39,9 @@ impl<T: Copy> VolatileCell<MaybeUninit<T>>{
 	pub unsafe fn load_value(&self)->T{
 		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr())
 	}
+	pub unsafe fn unwrap(&self) ->&VolatileCell<T>{
+		(*self.cell.get()).as_ptr().cast::<_>() as &_
+	}
 	pub fn zero(&self){
 		unsafe{core::intrinsics::volatile_store(self.cell.get(),MaybeUninit::zeroed())}
 	}
@@ -73,8 +76,21 @@ impl<T: Copy,Size: usize> Index<isize> for VolatileCell<[T;Size]>{
 	}
 }
 
+pub struct LockedVolatileCell<'a,T: Copy>{
+	lock: LockInterrupts,
+	wrapped: &'a VolatileCell<T>
+}
+
+impl<'a,T: Copy> Deref for LockedVolatileCell<'a,T>{
+	type Target = VolatileCell<T>;
+
+	fn deref(&self) -> &Self::Target {
+		self.wrapped
+	}
+}
+
 #[repr(transparent)]
-pub(crate) struct AtomicCell<T: Copy>{
+pub struct AtomicCell<T: Copy>{
     cell: UnsafeCell<T>
 }
 
@@ -95,6 +111,10 @@ impl<T: Copy> AtomicCell<T>{
             core::intrinsics::volatile_store(self.cell.get(),val);
         }
     }
+
+	pub fn lock(&self) -> LockedVolatileCell<T>{
+		LockedVolatileCell{lock: LockInterrupts::new(),wrapped: unsafe{std::mem::transmute(self)}}
+	}
 }
 
 impl<T: Copy> AtomicCell<MaybeUninit<T>>{
@@ -105,6 +125,9 @@ impl<T: Copy> AtomicCell<MaybeUninit<T>>{
 	pub unsafe fn load_value(&self)->T{
 		let lock = LockInterrupts::new();
 		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr())
+	}
+	pub unsafe fn unwrap(&self) ->&AtomicCell<T>{
+		(*self.cell.get()).as_ptr().cast::<_>() as &_
 	}
 	pub fn zero(&self){
 		let lock = LockInterrupts::new();
