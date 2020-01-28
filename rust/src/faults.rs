@@ -99,7 +99,7 @@ extern "C"{
     static _Fault: AtomicCell<Fault>;
 
     #[no_mangle]
-    static mut _FaultHandler: Option<*fn (Fault)->()>;
+    static mut _FaultHandler: Option<*unsafe extern"C" fn (Fault)->()>;
     #[no_mangle]
     static _FaultTriggered: AtomicCell<FaultTrigger>;
 }

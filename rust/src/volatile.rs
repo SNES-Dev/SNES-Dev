@@ -1,7 +1,7 @@
 use core::cell::UnsafeCell;
 use core::mem::MaybeUninit;
 use core::panicking::panic;
-use core::ops::{Index, Deref};
+use core::ops::{Index, Deref, AddAssign, Add, SubAssign, Sub, Mul, MulAssign, Div, DivAssign, Rem, RemAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use crate::LockInterrupts;
 use core::sync::atomic::{Ordering, compiler_fence};
 
@@ -30,6 +30,13 @@ impl<T: Copy> VolatileCell<T>{
             core::intrinsics::volatile_store(cell.get(),val)
         }
     }
+
+	pub fn copy_from(&self,other: &VolatileCell<T>){
+		if self==other{
+			return
+		}
+		unsafe { core::intrinsics::volatile_copy_nonoverlapping_memory(self.cell.get(), other.cell.get(), 1) }
+	}
 }
 
 impl<T: Copy> VolatileCell<MaybeUninit<T>>{
@@ -76,6 +83,54 @@ impl<T: Copy,Size: usize> Index<isize> for VolatileCell<[T;Size]>{
 	}
 }
 
+impl<A,T: Copy+Add<A>> AddAssign<A> for VolatileCell<T>{
+	fn add_assign(&self, rhs: A) {
+		self.store(self.load()+rhs)
+	}
+}
+
+impl<A,T: Copy+Sub<A>> SubAssign<A> for VolatileCell<T>{
+	fn sub_assign(&self, rhs: A) {
+		self.store(self.load()-rhs)
+	}
+}
+
+impl<A,T: Copy+Mul<A>> MulAssign<A> for VolatileCell<T>{
+	fn mul_assign(&self, rhs: A) {
+		self.store(self.load()*rhs)
+	}
+}
+
+impl<A,T: Copy+Div<A>> DivAssign<A> for VolatileCell<T>{
+	fn div_assign(&self, rhs: A) {
+		self.store(self.load()/rhs)
+	}
+}
+
+impl<A,T: Copy+Rem<A>> RemAssign<A> for VolatileCell<T>{
+	fn rem_assign(&self, rhs: A) {
+		self.store(self.load()%rhs)
+	}
+}
+
+impl<A,T: Copy+BitAnd<A>> BitAndAssign<A> for VolatileCell<T>{
+	fn bitand_assign(&self, rhs: A) {
+		self.store(self.load()&rhs)
+	}
+}
+
+impl<A,T: Copy+BitOr<A>> BitOrAssign<A> for VolatileCell<T>{
+	fn bitor_assign(&self, rhs: A) {
+		self.store(self.load()|rhs)
+	}
+}
+
+impl<A,T: Copy+BitXor<A>> BitXorAssign<A> for VolatileCell<T>{
+	fn bitxor_assign(&self, rhs: A) {
+		self.store(self.load()^rhs)
+	}
+}
+
 pub struct LockedVolatileCell<'a,T: Copy>{
 	lock: LockInterrupts,
 	wrapped: &'a VolatileCell<T>
@@ -114,6 +169,18 @@ impl<T: Copy> AtomicCell<T>{
 
 	pub fn lock(&self) -> LockedVolatileCell<T>{
 		LockedVolatileCell{lock: LockInterrupts::new(),wrapped: unsafe{std::mem::transmute(self)}}
+	}
+
+	pub const unsafe fn zeroed() -> AtomicCell<T>{
+		return core::mem::zeroed()
+	}
+
+	pub unsafe fn copy_from(&self, other: &AtomicCell<T>){
+		if self==other{
+			return
+		}
+		let _ = LockInterrupts::new();
+		core::intrinsics::volatile_copy_nonoverlapping_memory(self.cell.get(),other.cell.get(),1);
 	}
 }
 
@@ -166,3 +233,59 @@ impl<T: Copy,Size: usize> Index<isize> for AtomicCell<[T;Size]>{
 	}
 }
 
+
+impl<U,T: Copy+Add<U>> AddAssign<U> for AtomicCell<T>{
+	fn add_assign(&self, rhs: U) {
+		let lock = self.lock();
+		lock.store(lock.load()+rhs);
+	}
+}
+
+impl<U,T: Copy+Sub<U>> SubAssign<U> for AtomicCell<T>{
+	fn sub_assign(&self, rhs: U) {
+		let lock = self.lock();
+		lock.store(lock.load()-rhs);
+	}
+}
+
+impl<U,T: Copy+Mul<U>> MulAssign<U> for AtomicCell<T>{
+	fn mul_assign(&self, rhs: U) {
+		let lock = self.lock();
+		lock.store(lock.load()*rhs);
+	}
+}
+
+impl<U,T: Copy+Div<U>> DivAssign<U> for AtomicCell<T>{
+	fn div_assign(&self, rhs: U) {
+		let lock = self.lock();
+		lock.store(lock.load()/rhs);
+	}
+}
+
+impl<U,T: Copy+Rem<U>> RemAssign<U> for AtomicCell<T>{
+	fn rem_assign(&self, rhs: U) {
+		let lock = self.lock();
+		lock.store(lock.load()%rhs);
+	}
+}
+
+impl<U,T: Copy+BitAnd<U>> BitAndAssign<U> for AtomicCell<T>{
+	fn bitand_assign(&self, rhs: U) {
+		let lock = self.lock();
+		lock.store(lock.load()&rhs);
+	}
+}
+
+impl<U,T: Copy+BitOr<U>> BitOrAssign<U> for AtomicCell<T>{
+	fn bitor_assign(&self, rhs: U) {
+		let lock = self.lock();
+		lock.store(lock.load()|rhs);
+	}
+}
+
+impl<U,T: Copy+BitXor<U>> BitXorAssign<U> for AtomicCell<T>{
+	fn bitxor_assign(&self, rhs: U) {
+		let lock = self.lock();
+		lock.store(lock.load()^rhs);
+	}
+}

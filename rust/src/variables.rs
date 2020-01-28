@@ -9,7 +9,7 @@ extern "C"{
     static __counter_enable: VolatileCell<u8>;
 
     #[no_mangle]
-    static __joypads: [VolatileCell<u16>;4];
+    static __joypads: VolatileCell<[u16;4]>;
 
     #[no_mangle]
     static __screen_display: VolatileCell<u8>;
@@ -18,12 +18,14 @@ extern "C"{
     static _Random: VolatileCell<u16>;
 }
 
-fn random() -> &VolatileCell<u16>{
+pub fn random() -> &VolatileCell<u16>{
     return &unsafe { _Random }
 }
 
-fn joypads() -> &[VolatileCell<u16>;4] {
+pub fn joypads() -> &VolatileCell<[u16;4]> {
     return &unsafe {__joypads};
 }
 
-
+pub fn counter_enable() -> &VolatileCell<u8>{
+    return &unsafe{__counter_enable};
+}
