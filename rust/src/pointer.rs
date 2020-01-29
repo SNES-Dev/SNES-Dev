@@ -2,6 +2,8 @@
 use core::ops::Deref;
 use core::mem::MaybeUninit;
 
+//Pointers are layed out exactly the same way as a PackedPtr, except that there is a trailing padding byte, that can hold any bit-pattern, including uninitialized data
+
 #[repr(C,packed)]
 #[derive(Clone,Copy,PartialEq,PartialOrd,Hash)]
 pub struct ShortPtr<T: ?Sized>(u16);
