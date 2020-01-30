@@ -289,3 +289,18 @@ impl<U,T: Copy+BitXor<U>> BitXorAssign<U> for AtomicCell<T>{
 		lock.store(lock.load()^rhs);
 	}
 }
+
+#[repr(transparent)]
+pub struct VolatileRead<T: Copy>{
+	cell: UnsafeCell<T>
+}
+
+impl<T: Copy> VolatileRead<T>{
+	pub fn load(&self) -> T{
+		unsafe {core::intrinsics::volatile_load(self.cell.get())}
+	}
+
+	pub fn read_only(v: &VolatileCell<T>) -> &VolatileRead<T>{
+		unsafe { std::mem::transmute(v)}
+	}
+}
