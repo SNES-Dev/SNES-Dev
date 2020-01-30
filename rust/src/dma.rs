@@ -5,6 +5,7 @@ use crate::volatile::*;
 use crate::LockVBlank;
 use core::ops::BitOrAssign;
 use core::mem::MaybeUninit;
+use crate::variables::LockVBlank;
 
 #[repr(C,packed)]
 #[derive(Copy,Clone)]

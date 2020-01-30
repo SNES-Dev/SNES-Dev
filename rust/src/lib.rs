@@ -10,7 +10,6 @@ use crate::volatile::LockedVolatileCell;
 compile_error!("Can only build snes-dev rust for the 65816 architecture");
 
 static mut _DISABLE_INTERRUPTS: u16 = 0;
-static mut _DISABLE_VBLANK: u16 = 0;
 
 pub struct LockInterrupts;
 
@@ -37,36 +36,30 @@ impl Drop for LockInterrupts{
 	}
 }
 
-pub struct LockVBlank;
 
-impl LockVBlank{
-	pub fn lock() -> Self{
-		variables::counter_enable() &= !0x80u8;
-		unsafe{
-			compiler_fence(Ordering::SeqCst);
-			_DISABLE_VBLANK += 1;
-		}
-		LockVBlank
-	}
-}
-
-impl Drop for LockVBlank{
-	fn drop(&mut self) {
-		unsafe{
-			_DISABLE_VBLANK -= 1;
-			compiler_fence(Ordering::SeqCst);
-			if _DISABLE_VBLANK==0{
-				variables::counter_enable() |= 0x80u8
-			}
-		}
-	}
-}
-
-pub mod variables;
+#[cfg(feature="volatile")]
 pub mod volatile;
-pub mod faults;
-pub mod dma;
+
+#[cfg(not(feature="volatile"))]
+pub(crate) mod volatile;
+
+#[cfg(feature="variables")]
+pub mod variables;
+
+#[cfg(and(not(feature="variables"),feature="dma"))]
+pub(crate) mod variables;
+
+#[cfg(feature="pointer")]
 pub mod pointer;
+
+#[cfg(not(feature="pointer"))]
+pub(crate) mod pointer;
+
+#[cfg(feature="faults")]
+pub mod faults;
+
+#[cfg(feature="dma")]
+pub mod dma;
 
 #[cfg(feature="memctl")]
 pub mod memctl;

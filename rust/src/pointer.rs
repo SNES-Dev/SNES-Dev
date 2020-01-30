@@ -21,6 +21,7 @@ pub struct PackedPtr<T: ?Sized>(u16,u8);
 pub struct PackedMutPtr<T: ?Sized>(u16,u8);
 
 impl<T: ?Sized> From<*T> for PackedPtr<T>{
+    #[inline]
     fn from(val: *const T) -> Self {
         unsafe{
             core::mem::transmute_copy::<Self>(&val)
@@ -29,6 +30,7 @@ impl<T: ?Sized> From<*T> for PackedPtr<T>{
 }
 
 impl<T: ?Sized> From<*mut T> for PackedPtr<T>{
+    #[inline]
     fn from(val: *mut T) -> Self {
         unsafe{
             core::mem::transmute_copy::<Self>(&val)
@@ -37,6 +39,7 @@ impl<T: ?Sized> From<*mut T> for PackedPtr<T>{
 }
 
 impl<T: ?Sized> From<*mut T> for PackedMutPtr<T>{
+    #[inline]
     fn from(val: *mut T) -> Self {
         unsafe{
             core::mem::transmute_copy::<Self>(&val)
@@ -65,6 +68,7 @@ impl<T: ?Sized> From<PackedMutPtr<T>> for *T{
 }
 
 impl<T: ?Sized> From<PackedPtr<T>> for *T{
+    #[inline]
     fn from(val: PackedPtr<T>) -> Self {
         let mut ret: MaybeUninit<Self> = MaybeUninit::uninit();
         unsafe{
@@ -74,7 +78,9 @@ impl<T: ?Sized> From<PackedPtr<T>> for *T{
     }
 }
 
+
 impl<T: ?Sized> From<*T> for ShortPtr<T>{
+    #[inline]
     fn from(val: *T) -> Self {
         unsafe{
             core::mem::transmute_copy::<Self>(&val)
@@ -83,6 +89,7 @@ impl<T: ?Sized> From<*T> for ShortPtr<T>{
 }
 
 impl<T: ?Sized> From<*mut T> for ShortPtr<T>{
+    #[inline]
     fn from(_: *mut T) -> Self {
         unsafe{
             core::mem::transmute_copy::<Self>(&val)
@@ -91,6 +98,7 @@ impl<T: ?Sized> From<*mut T> for ShortPtr<T>{
 }
 
 impl<T: ?Sized> From<*mut T> for ShortMutPtr<T>{
+    #[inline]
     fn from(_: *mut T) -> Self {
         unsafe{
             core::mem::transmute_copy::<Self>(&val)
