@@ -1,6 +1,6 @@
 [submodule "binutils"]
 	path = binutils
-	url = ../../LightningCreations/Binutils-65816.git
+	url = https://github.com/LightningCreations/Binutils-65816.git
 [submodule "llvm-project"]
 	path = llvm-project
-	url = ../llvm-project.git
+	url = https://github.com/chorman0773/llvm-project.git
