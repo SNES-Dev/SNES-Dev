@@ -304,3 +304,36 @@ impl<T: Copy> VolatileRead<T>{
 		unsafe { std::mem::transmute(v)}
 	}
 }
+
+#[repr(transparent)]
+pub struct AtomicRead<T: Copy>{
+	cell: UnsafeCell<T>
+}
+
+pub struct LockedVolatileRead<'a,T: Copy>{
+	lock: LockInterrupts,
+	cell: &'a VolatileRead<T>
+}
+
+impl<'a,T: Copy> Deref for LockedVolatileRead<'a,T>{
+	type Target = VolatileRead<T>;
+
+	fn deref(&self) -> &Self::Target {
+		self.cell
+	}
+}
+
+impl<T: Copy> AtomicRead<T>{
+	pub fn load(&self) -> T{
+		let lock = LockInterrupts::new();
+		unsafe {core::intrinsics::volatile_load(self.cell.get())}
+	}
+
+	pub fn read_only(v: &AtomicCell<T>) -> &AtomicRead<T>{
+		unsafe { std::mem::transmute(v)}
+	}
+
+	pub fn lock(&self) -> LockedVolatileRead<T>{
+		LockedVolatileRead{lock: LockInterrupts::new(),cell: unsafe { std::mem::transmute(self) } }
+	}
+}
