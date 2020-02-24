@@ -27,9 +27,9 @@
 
 #define __QC_SIZE_MODEI_8 byte
 #define __QC_SIZE_MODEI_16 HI
-#define __QC_SIZE_MODEI_24 SI
+#define __QC_SIZE_MODEI_24 PSI
 #define __QC_SIZE_MODEI_32 SI
-#define __QC_SIZE_MODEI_48 DI
+#define __QC_SIZE_MODEI_48 PDI
 #define __QC_SIZE_MODEI_64 DI
 #define __QC_SIZE_MODEI_128 TI
 #define __QC_SIZE_MODEI_256 OI
