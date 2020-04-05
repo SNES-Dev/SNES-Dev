@@ -11,24 +11,43 @@ compile_error!("Can only build snes-dev rust for the 65816 architecture");
 
 static mut _DISABLE_INTERRUPTS: u16 = 0;
 
-pub struct LockInterrupts;
+pub struct InterruptGuard(());
 
-impl LockInterrupts{
-	pub fn new() -> LockInterrupts{
+impl InterruptGuard {
+	///
+	/// Locks Interrupts and forms a sequentially-consistent barrier with the compiler
+	pub fn lock() -> Self{
 		unsafe{
 			asm!("SEI"::::"volatile");
 			compiler_fence(Ordering::SeqCst);
 			_DISABLE_INTERRUPTS += 1;
 		}
-		LockInterrupts
+		Self(())
+	}
+
+	///
+	/// Constructs a Scope Guard that will unlock interrupts on a Drop
+	/// The behavior is undefined unless Interrupts are presently disabled
+	/// via the issuance of an SEI instruction (or the previous construction of an InterruptGuard)
+	pub unsafe fn inherit() -> Self{
+		compiler_fence(Ordering::SeqCst);
+		_DISABLE_INTERRUPTS += 1;
+		Self(())
 	}
 }
 
-impl Drop for LockInterrupts{
+impl Clone for InterruptGuard {
+	fn clone(&self) -> Self {
+		unsafe{ Self::inherit()}
+	}
+
+}
+
+impl Drop for InterruptGuard {
 	fn drop(&mut self){
-		compiler_fence(Ordering::SeqCst);
 		unsafe {
 			_DISABLE_INTERRUPTS-= 1;
+			compiler_fence(Ordering::SeqCst);
 			if _DISABLE_INTERRUPTS==0{
 				asm!("CLI"::::"volatile");
 			}

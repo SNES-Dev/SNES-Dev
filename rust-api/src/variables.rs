@@ -3,7 +3,6 @@
 use crate::volatile::*;
 use core::sync::atomic::{compiler_fence, Ordering};
 
-#[allow(LINK)]
 extern "C"{
 
     #[no_mangle]

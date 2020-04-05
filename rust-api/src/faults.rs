@@ -4,11 +4,11 @@ use crate::volatile::*;
 #[feature(core_intrinsics)]
 use core::mem::MaybeUninit;
 use core::cell::UnsafeCell;
-use crate::LockInterrupts;
+use crate::InterruptGuard;
 use core::sync::atomic::{compiler_fence, Ordering};
 
 #[repr(C,u16,packed)]
-#[derive(Copy,Clone,Default)]
+#[derive(Copy,Clone)]
 pub enum Fault{
     Ok = 0, // Seems odd that I have to represent the absense of a Fault as a Fault itself
     Panic = 1,
@@ -108,7 +108,7 @@ pub enum Fault{
     ImplDepF(MaybeUninit<*()>) = 0x210F
 }
 
-#[repr(C,u8)]
+#[repr(u8)]
 enum FaultTrigger{
     None = 0,
     Sync = 1,
@@ -127,7 +127,7 @@ extern "C"{
 
 
 pub fn fault_handler() -> &AtomicCell<Option<*extern"C" fn(Fault)->()>>{
-    return unsafe{&_FaultHandler};
+    unsafe{&_FaultHandler}
 }
 
 pub fn raise(f: Fault) -> (){
@@ -135,9 +135,9 @@ pub fn raise(f: Fault) -> (){
         return;
     }
     loop {
-        unsafe { _Fault }.store(f);
+        unsafe { _Fault .store(f)}
         asm!("WAI"::::"volatile");
-        if let FaultTrigger::Async = unsafe { _FaultTriggered }.load(){
+        if let FaultTrigger::Async = unsafe { _FaultTriggered.load()}{
             continue;
         }else{
             compiler_fence(Ordering::SeqCst);
