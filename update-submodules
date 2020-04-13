@@ -8,6 +8,16 @@ git push
 popd
 done
 
+pushd rust/src/llvm-project
+git checkout master
+git pull
+popd
+pushd rust
+git add .
+git commit -m "Update llvm-project"
+git push
+popd
+
 git add .
 git commit -m "Update Submodules"
 
