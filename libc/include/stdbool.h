@@ -8,7 +8,7 @@
 #ifndef __cplusplus
 #define bool _Bool
 #define true 1
-#define false 2
+#define false 0
 #endif
 
 #endif //SNES_DEV_STDBOOL_H
