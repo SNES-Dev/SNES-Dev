@@ -1,0 +1,13 @@
+#!/bin/bash
+
+for dir in rust llvm-project
+do
+pushd $dir
+git pull upstream master
+git push
+popd
+done
+
+git add .
+git commit -m "Update Submodules"
+

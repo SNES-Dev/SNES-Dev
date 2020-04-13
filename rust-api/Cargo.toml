@@ -3,7 +3,7 @@ name = "snesdev"
 version = "0.1.0"
 authors = ["Connor Horman <chorman64@gmail.com>"]
 edition = "2018"
-
+target = "wc65c816"
 
 [features]
 volatile=[]
@@ -16,5 +16,3 @@ memctl=["pointer"]
 default=["volatile","variables","faults"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
