@@ -1,9 +1,11 @@
 use core::cell::UnsafeCell;
-use core::mem::MaybeUninit;
+use core::mem::{MaybeUninit, transmute};
 use core::panicking::panic;
 use core::ops::{Index, Deref, AddAssign, Add, SubAssign, Sub, Mul, MulAssign, Div, DivAssign, Rem, RemAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use crate::InterruptGuard;
 use core::sync::atomic::{Ordering, compiler_fence};
+use core::marker::PhantomData;
+use core::ptr::NonNull;
 
 ///
 /// Represents a volatile value in memory
@@ -13,20 +15,27 @@ use core::sync::atomic::{Ordering, compiler_fence};
 /// And the inherit volatility of
 #[repr(transparent)]
 pub struct VolatileCell<T: Copy>{
-    cell: UnsafeCell<T>
+    cell: UnsafeCell<()>,
+	phantom: PhantomData<T>
 }
 
 unsafe impl<T: Copy + Send> Send for VolatileCell<T>{}
 
 impl<T: Copy> VolatileCell<T>{
+	pub unsafe fn wrap(ptr: NonNull<T>)->&Self{
+		transmute(ptr)
+	}
+	pub unsafe fn wrap_nullable(ptr: *mut T)->Option<&Self>{
+		transmute(ptr)
+	}
     ///
     /// Loads the value stored in the Cell and returns it
     pub fn load(&self) -> T{
-        unsafe{core::intrinsics::volatile_load(cell.get())}
+        unsafe{core::intrinsics::volatile_load(cell.get() as *const T)}
     }
     pub fn store(&self,val: T){
         unsafe{
-            core::intrinsics::volatile_store(cell.get(),val)
+            core::intrinsics::volatile_store(cell.get()as *mut T,val)
         }
     }
 
@@ -34,7 +43,7 @@ impl<T: Copy> VolatileCell<T>{
 		if self==other{
 			return
 		}
-		unsafe { core::intrinsics::volatile_copy_nonoverlapping_memory(self.cell.get(), other.cell.get(), 1) }
+		unsafe { core::intrinsics::volatile_copy_nonoverlapping_memory(self.cell.get() as *mut T, other.cell.get() as *mut T, 1) }
 	}
 }
 
@@ -88,24 +97,33 @@ impl<'a,T: Copy> Deref for LockedVolatileCell<'a,T>{
 
 #[repr(transparent)]
 pub struct AtomicCell<T: Copy>{
-    cell: UnsafeCell<T>
+    cell: UnsafeCell<()>,
+	phantom: PhantomData<T>
 }
 
 unsafe impl<T: Copy + Send> Send for AtomicCell<T>{}
 unsafe impl<T: Copy + Send> Sync for AtomicCell<T>{}
 
 impl<T: Copy> AtomicCell<T>{
+	pub fn exchange(&self, val: T) -> T{
+		let _lock = InterruptGuard::lock();
+		unsafe{
+			let ret = core::intrinsics::volatile_load(self.cell.get() as *mut T);
+			core::intrinsics::volatile_store(self.cell.get() as *mut T,val);
+			ret
+		}
+	}
     pub fn load(&self) -> T{
-		let lock = InterruptGuard::lock();
+		let _lock = InterruptGuard::lock();
         unsafe{
-            core::intrinsics::volatile_load(self.cell.get())
+            core::intrinsics::volatile_load(self.cell.get() as *mut T)
         }
     }
 
     pub fn store(&self,val: T) -> (){
-		let lock = InterruptGuard::lock();
+		let _lock = InterruptGuard::lock();
         unsafe{
-            core::intrinsics::volatile_store(self.cell.get(),val);
+            core::intrinsics::volatile_store(self.cell.get() as *mut T,val);
         }
     }
 
@@ -113,15 +131,11 @@ impl<T: Copy> AtomicCell<T>{
 		LockedVolatileCell{lock: InterruptGuard::lock(),wrapped: unsafe{std::mem::transmute(self)}}
 	}
 
-	pub const unsafe fn zeroed() -> AtomicCell<T>{
-		return core::mem::zeroed()
-	}
-
 	pub unsafe fn copy_from(&self, other: &AtomicCell<T>){
 		if self==other{
 			return
 		}
-		let _ = InterruptGuard::lock();
+		let _lock = InterruptGuard::lock();
 		core::intrinsics::volatile_copy_nonoverlapping_memory(self.cell.get(),other.cell.get(),1);
 	}
 }
@@ -129,29 +143,29 @@ impl<T: Copy> AtomicCell<T>{
 impl<T: Copy> AtomicCell<MaybeUninit<T>>{
 	pub fn store_value(&self,val: T){
 		let _lock = InterruptGuard::lock();
-		unsafe{core::intrinsics::volatile_store((*self.cell.get()).as_mut_ptr(),val)};
+		unsafe{core::intrinsics::volatile_store(self.cell.get() as *mut T,val)};
 	}
 	pub unsafe fn load_value(&self)->T{
 		let _lock = InterruptGuard::lock();
-		core::intrinsiscs::volatile_load((*self.cell.get()).as_ptr())
+		core::intrinsiscs::volatile_load(self as *const T)
 	}
 	pub unsafe fn unwrap(&self) ->&AtomicCell<T>{
-		(*self.cell.get()).as_ptr().cast::<_>() as &_
+		transmute(self)
 	}
 	pub fn zero(&self){
 		let _lock = InterruptGuard::lock();
-		unsafe{core::intrinsics::volatile_store(self.cell.get(),MaybeUninit::zeroed())}
+		unsafe{core::intrinsics::volatile_store(self.cell.get() as *mut MaybeUninit<T>,MaybeUninit::zeroed())}
 	}
 }
 
 #[repr(transparent)]
 pub struct VolatileRead<T: Copy>{
-	cell: UnsafeCell<T>
+	cell: VolatileCell<T>
 }
 
 impl<T: Copy> VolatileRead<T>{
 	pub fn load(&self) -> T{
-		unsafe {core::intrinsics::volatile_load(self.cell.get())}
+		self.cell.load()
 	}
 
 	pub fn read_only(v: &VolatileCell<T>) -> &VolatileRead<T>{
@@ -161,7 +175,7 @@ impl<T: Copy> VolatileRead<T>{
 
 #[repr(transparent)]
 pub struct AtomicRead<T: Copy>{
-	cell: UnsafeCell<T>
+	cell: AtomicCell<T>
 }
 
 pub struct LockedVolatileRead<'a,T: Copy>{
@@ -179,8 +193,7 @@ impl<'a,T: Copy> Deref for LockedVolatileRead<'a,T>{
 
 impl<T: Copy> AtomicRead<T>{
 	pub fn load(&self) -> T{
-		let lock = InterruptGuard::lock();
-		unsafe {core::intrinsics::volatile_load(self.cell.get())}
+		self.cell.load()
 	}
 
 	pub fn read_only(v: &AtomicCell<T>) -> &AtomicRead<T>{
