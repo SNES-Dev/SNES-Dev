@@ -1,0 +1,3 @@
+
+set(CMAKE_C_COMPILER $<TARGET_FILE:clang>)
+set(CMAKE_CXX_COMPILER $<TARGET_FILE:clang++>)

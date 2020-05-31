@@ -1,0 +1,13 @@
+
+set(CMAKE_SYSTEM_NAME snesdev)
+set(CMAKE_SYSTEM_PROCESSOR wc65c816)
+
+set(CMAKE_SYSROOT @CMAKE_INSTALL_PREFIX@/wc65c816-snesdev-default-elf/sysroot)
+
+set(tools-dir @CMAKE_INSTALL_PREFIX@/wc65c816-snesdev-default-elf/tools)
+set(CMAKE_ASM_COMPILER ${tool-dir}/bin/clang)
+set(CMAKE_C_COMPILER ${tools-dir}/bin/clang)
+set(CMAKE_CXX_COMPILER ${tools-dir}/bin/clang++)
+set(CMAKE_Rust_COMPILER ${tools-dir}/bin/rustc)
+set(CMAKE_AR ${tools-dir}/bin/llvm-ar)
+set(CMAKE_RANLIB ${tools-dir}/bin/llvm-ranlib)
