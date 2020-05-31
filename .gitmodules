@@ -4,3 +4,9 @@
 [submodule "rust"]
 	path = rust
 	url = https://github.com/chorman0773/rust.git
+[submodule "bsnes"]
+	path = bsnes
+	url = https://github.com/chorman0773/bsnes.git
+[submodule "elfutils"]
+	path = elfutils
+	url = https://github.com/chorman0773/util_libs.git
