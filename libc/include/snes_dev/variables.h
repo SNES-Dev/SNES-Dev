@@ -7,6 +7,7 @@
 
 #include <qc_int.h>
 
+
 extern volatile _UInt8 __counter_enable;
 extern volatile _UInt8 __screen_display;
 extern volatile _UInt16 __joypad1;
@@ -14,6 +15,8 @@ extern volatile _UInt16 __joypad2;
 extern volatile _UInt16 __joypad3;
 extern volatile _UInt16 __joypad4;
 
+#ifndef _SNESDEV_NO_EXSYMS
 extern volatile const _UInt16 _Random;
+#endif
 
 #endif //SNES_DEV_VARIABLES_H

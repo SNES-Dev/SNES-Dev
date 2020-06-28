@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 
+// malloc impl is here
 struct __head_descriptor{
     uint128_t __alloc_flgs;
     uint8_t __heap_length;
@@ -52,4 +53,32 @@ void free(void* v){
     for(uint8_t i = 0;i<block.__continuous_size;i++)
         u |= UINT128_C(1)<<(i+block.__page_root);
     __heap_descriptor->__alloc_flgs &= ~u;
+}
+
+
+// Rest is impl idependent
+
+__attribute__((alloc_size(0))) void* calloc(size_t elemsz,size_t cnt){
+    size_t total = elemnsz*cnt;
+    unsigned char* ret = malloc(total);
+    if(!ret)
+        return NULL;
+    for(size_t i = 0;i<total;i++)
+        ret[i] = 0;
+    return ret;
+}
+
+void __throw_bad_alloc();
+void* _ZNStnwPvj(size_t sz)__attribute__((weak)){
+    void* a = malloc(sz);
+    if(!a)
+        __throw_bad_alloc();
+    return a;
+}
+
+void* _ZNStnaPvj(size_t sz)__attribute__((weak)){
+    void* a = malloc(sz);
+    if(!a)
+        __throw_bad_alloc();
+    return a;
 }

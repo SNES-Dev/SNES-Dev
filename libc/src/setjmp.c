@@ -4,7 +4,7 @@
 
 #include <setjmp.h>
 
-int __setjmp(jmp_buf __buf){
+int __setjmp(jmp_buf __buf) __attribute__((returns_twice)){
     __short_ptr(void) __ptr;
     __builtin_wc65c816_acc16();
     __asm__ volatile("tsa");
