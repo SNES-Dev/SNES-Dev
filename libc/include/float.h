@@ -12,16 +12,16 @@
 #define DBL_DECIMAL_DIG 16
 #define LDBL_DECIMAL_DIG 35
 
-#define FLT_MIN 1fe-126
-#define DBL_MIN 1e-1022
-#define LDBL_MIN 1le-16382
+#define FLT_MIN 0x1p-126f
+#define DBL_MIN 0x1p-1022
+#define LDBL_MIN 0x1p-16382l
 
-#define FLT_MAX 16777215e+127
-#define DBL_MAX 9007199254740992e+1023
+#define FLT_MAX 0xFFFFFFp+127f
+#define DBL_MAX 0x7FFFFFFFFFFFFFp+1023
 
-#define FLT_EPSILON 1fe-23
-#define DBL_EPSILON 1e-53
-#define LDBL_EPSILON 1le-113
+#define FLT_EPSILON 0x1p-23f
+#define DBL_EPSILON 0x1p-53
+#define LDBL_EPSILON 0x1p-113l
 
 #define FLT_DIG 7
 #define DBL_DIG 16
