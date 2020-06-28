@@ -24,7 +24,7 @@
 #define LDBL_EPSILON 1le-113
 
 #define FLT_DIG 7
-#define DBL_DIG 15
+#define DBL_DIG 16
 #define LDBL_DIG 34
 
 #define FLT_MANT_DIG 24
