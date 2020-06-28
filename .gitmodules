@@ -10,3 +10,6 @@
 [submodule "elfutils"]
 	path = elfutils
 	url = https://github.com/chorman0773/util_libs.git
+[submodule "qc"]
+	path = qc
+	url = https://github.com/chorman0773/qc.git

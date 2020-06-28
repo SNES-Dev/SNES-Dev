@@ -1,3 +1,5 @@
+#![allow(non_camel_case_types)]
+
 use crate::__QcType;
 
 #[repr(qc_struct(float32))]

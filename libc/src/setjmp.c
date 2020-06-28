@@ -4,15 +4,12 @@
 
 #include <setjmp.h>
 
-extern void* volatile __ebp;
-
 int __setjmp(jmp_buf __buf){
     __short_ptr(void) __ptr;
     __builtin_wc65c816_acc16();
-    __asm__ volatile("TSA");
-    __asm__("STA %0":"=r"(__ptr));
+    __asm__ volatile("tsa");
+    __asm__("sta %0":"=r"(__ptr));
     __buf[0].__sp = __ptr;
-    __buf[0].__bp = __ebp;
     return 0;
 }
 
@@ -24,9 +21,8 @@ void longjmp(jmp_buf __buf,int val) __attribute__((noreturn)){
         val = 1;
     __eax = val;
     __builtin_wc65c816_acc16();
-    __ebp = __buf[0].__bp;
-    __asm__("LDA %0"::"r"(__buf.__sp))
-    __asm__ volatile("TAS");
-    __asm__ volatile("RTL");
+    __asm__("lda %0"::"r"(__buf.__sp))
+    __asm__ volatile("tas");
+    __asm__ volatile("rtl"); // Returning from a noreturn function is UB, but I don't care.
     __builtin_unreachable();
 }
