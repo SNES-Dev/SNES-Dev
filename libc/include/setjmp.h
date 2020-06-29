@@ -7,7 +7,7 @@
 
 typedef struct __jmp_buf{
     __short_ptr(void) __sp;
-    void* __bp;
+    unsigned char __s;
 } jmp_buf[1];
 
 int __setjmp(jmp_buf __buf)__attribute__((returns_twice));
