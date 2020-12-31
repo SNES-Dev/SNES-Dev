@@ -4,6 +4,8 @@
 #![feature(asm)]
 #![feature(core_intrinsics)]
 
+#![cfg_attr(vendor=lccc,feature(lccc_xlang_attributes))]
+
 use core::sync::atomic::{compiler_fence, Ordering};
 use crate::volatile::LockedVolatileCell;
 #[cfg(not(target="wc65c816"))]
@@ -40,7 +42,6 @@ impl Clone for InterruptGuard {
 	fn clone(&self) -> Self {
 		unsafe{ Self::inherit()}
 	}
-
 }
 
 impl Drop for InterruptGuard {
