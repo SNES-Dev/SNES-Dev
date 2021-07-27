@@ -1,12 +1,5 @@
 # w65 ABI
 
-## Table of Contents
-
-
-[TOC]
-
-
-
 ## Types
 
 
