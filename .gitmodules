@@ -1,9 +1,3 @@
-[submodule "bsnes"]
-	path = bsnes
-	url = https://github.com/chorman0773/bsnes.git
-[submodule "elfutils"]
-	path = elfutils
-	url = https://github.com/chorman0773/util_libs.git
 [submodule "qc"]
 	path = qc
-	url = https://github.com/chorman0773/qc.git
+	url = https://github.com/SNES-Dev/qc.git
