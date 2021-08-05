@@ -1,3 +1,9 @@
 [submodule "qc"]
 	path = qc
 	url = https://github.com/SNES-Dev/qc.git
+[submodule "binutils-gdb"]
+	path = binutils-gdb
+	url = https://github.com/SNES-Dev/binutils-gdb.git
+[submodule "gcc"]
+	path = gcc
+	url = https://github.com/SNES-Dev/gcc.git

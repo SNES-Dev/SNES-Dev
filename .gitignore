@@ -1,5 +1,4 @@
 /.idea/
-/cmake-build-*/
-/rust/.idea/
-/rust/Cargo.lock
-/build*/
+cmake-build-*/
+build*/
+autom4te.cache/
