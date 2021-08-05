@@ -35,16 +35,16 @@ CFLAGS_FOR_BUILD := @CFLAGS_FOR_BUILD@
 CXX_FOR_BUILD := @CXX_FOR_BUILDS@
 CXXFLAGS_FOR_BUILD := @CXXFLAGS_FOR_BUILD@
 
-RUSTC_FOR_TARGET := @RUSTC_FOR_TARGET@
-RUSTFLAGS_FOR_TARGET := @RUSTFLAGS_FOR_TARGET@
-CC_FOR_TARGET := @CC_FOR_TARGET@
-CFLAGS_FOR_TARGET := @CFLAGS_FOR_TARGET@
-CXX_FOR_TARGET := @CXX_FOR_TARGET@
-CXXFLAGS_FOR_TARGET := @CXXFLAGS_FOR_TARGET@
-AS_FOR_TARGET := @AS_FOR_TARGET@
-AR_FOR_TARGET := @AR_FOR_TARGET@
-LD_FOR_TARGET := @LD_FOR_TARGET@
-OBJCOPY_FOR_TARGET := @OBJCOPY_FOR_TARGET@
+RUSTC_FOR_TARGET = @RUSTC_FOR_TARGET@
+RUSTFLAGS_FOR_TARGET = @RUSTFLAGS_FOR_TARGET@
+CC_FOR_TARGET = @CC_FOR_TARGET@
+CFLAGS_FOR_TARGET = @CFLAGS_FOR_TARGET@
+CXX_FOR_TARGET = @CXX_FOR_TARGET@
+CXXFLAGS_FOR_TARGET = @CXXFLAGS_FOR_TARGET@
+AS_FOR_TARGET = @AS_FOR_TARGET@
+AR_FOR_TARGET = @AR_FOR_TARGET@
+LD_FOR_TARGET = @LD_FOR_TARGET@
+OBJCOPY_FOR_TARGET = @OBJCOPY_FOR_TARGET@
 
 
 # Target Variables
@@ -59,6 +59,9 @@ target=@target@
 
 srcdir=@srcdir@
 builddir=@builddir@
+
+abs_builddir=@abs_builddir@
+abs_srcdir=@abs_srcdir@
 
 
 # Installation Directories
@@ -94,48 +97,47 @@ target_includedir := ${sysroot}/include
 HOST_DIRS = @host_dirs@
 TARGET_DIRS = @target_dirs@
 
-BASE_DEFS = INSTALL=$(INSTALL); export INSTALL; \
-			INSTALL_PROGRAM=$(INSTALL_PROGRAM); export INSTALL_PROGRAM; \
-			LN_S=$(LN_S); export LN_S; \
-			MKDIR_P=$(MKDIR_P); export MKDIR_P; \
-			GREP=$(GREP); export GREP; \
-			AWK=$(AWK); export AWK; \
-			SED=$(SED); export SED; 
+BASE_DEFS = INSTALL="$(INSTALL)"; export INSTALL; \
+			INSTALL_PROGRAM="$(INSTALL_PROGRAM)"; export INSTALL_PROGRAM; \
+			LN_S="$(LN_S)"; export LN_S; \
+			MKDIR_P="$(MKDIR_P)"; export MKDIR_P; \
+			GREP="$(GREP)"; export GREP; \
+			AWK="$(AWK)"; export AWK; \
+			SED="$(SED)"; export SED; 
 
 HOST_DEFS =	$(BASE_DEFS) \
-			CC_FOR_BUILD=$(CC_FOR_BUILD); export CC_FOR_BUILD; \
-			CFLAGS_FOR_BUILD=$(CFLAGS_FOR_BUILD); export CFLAGS_FOR_BUILD; \
-			CC=$(CC); export CC; \
-			CFLAGS=$(CFLAGS); export CFLAGS; \
-			CXX_FOR_BUILD=$(CXX_FOR_BUILD); export CX_FOR_BUILD; \
-			CXXFLAGS_FOR_BUILD=$(CFLAGS_FOR_BUILD); export CXXFLAGS_FOR_BUILD; \
-			CXX=$(CXX); export CX; \
-			CXXFLAGS=$(CXXFLAGS); export CXXFLAGS; \
-			RUSTC_FOR_BUILD=$(RUSTC_FOR_BUILD); export RUSTC_FOR_BUILD; \
-			RUSTFLAGS_FOR_BUILD=$(RUSTFLAGS_FOR_BUILD); export RUSTFLAGS_FOR_BUILD; \
-			RUSTC=$(RUSTC); export RUSTC; \
-			RUSTFLAGS=$(RUSTFLAGS); export RUSTFLAGS; \
-			AR=$(AR); export AR; \
-			prefix=$(prefix); export prefix; \
-			exec_prefix=$(exec_prefix); export exec_prefix; \
-			bindir=$(bindir); export bindir; \
-			sbindir=$(sbindir); export sbindir; \
-			libexec=$(libexecdir); export libexecdir; \
-			libdir=$(libdir); export libdir; \
-			includedir=$(includedir); export includedir; \
+			CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+			CFLAGS_FOR_BUILD="$(CFLAGS_FOR_BUILD)"; export CFLAGS_FOR_BUILD; \
+			CC="$(CC)"; export CC; \
+			CFLAGS="$(CFLAGS)"; export CFLAGS; \
+			CXX_FOR_BUILD="$(CXX_FOR_BUILD)"; export CX_FOR_BUILD; \
+			CXXFLAGS_FOR_BUILD="$(CFLAGS_FOR_BUILD)"; export CXXFLAGS_FOR_BUILD; \
+			CXX="$(CXX)"; export CXX; \
+			CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+			RUSTC_FOR_BUILD="$(RUSTC_FOR_BUILD)"; export RUSTC_FOR_BUILD; \
+			RUSTFLAGS_FOR_BUILD="$(RUSTFLAGS_FOR_BUILD)"; export RUSTFLAGS_FOR_BUILD; \
+			RUSTC="$(RUSTC)"; export RUSTC; \
+			RUSTFLAGS="$(RUSTFLAGS)"; export RUSTFLAGS; \
+			AR="$(AR)"; export AR; \
+			prefix="$(prefix)"; export prefix; \
+			exec_prefix="$(exec_prefix)"; export exec_prefix; \
+			bindir="$(bindir)"; export bindir; \
+			sbindir="$(sbindir)"; export sbindir; \
+			libexec="$(libexecdir)"; export libexecdir; \
+			libdir="$(libdir)"; export libdir; \
+			includedir="$(includedir)"; export includedir; \
 			datarootdir=$(datarootdir); export datarootdir; \
-			datadir=$(datadir); export datadir; \
-			docdir=$(docdir); export docdir; \
-			mandir=$(mandir); export mandir; \
-			infodir=$(infodir); export infodir; \
-			htmldir=$(htmldir); export htmldir; \
-			dvidir=$(dvidir); export dvidir; \
-			pdfdir=$(pdfdir); export pdfdir; \
-			localedir=$(localedir); export localedir; \
-			sysconfdir=$(sysconfdir); export sysconfdir; \
-			sharedstatedir=$(sharedstatedir); export sharedstatedir; \
-			localstatedir=$(localstatedir); export localstatedir; \
-			runstatedir=$(bindir); export runstatedir
+			datadir="$(datadir)"; export datadir; \
+			docdir="$(docdir)"; export docdir; \
+			mandir="$(mandir)"; export mandir; \
+			infodir="$(infodir)"; export infodir; \
+			htmldir="$(htmldir)"; export htmldir; \
+			dvidir="$(dvidir)"; export dvidir; \
+			pdfdir="$(pdfdir)"; export pdfdir; \
+			localedir="$(localedir)"; export localedir; \
+			sysconfdir="$(sysconfdir)"; export sysconfdir; \
+			sharedstatedir="$(sharedstatedir)"; export sharedstatedir; \
+			localstatedir="$(localstatedir)"; export localstatedir
 
 HOST_CONFIGURE_OPTS = --prefix $(prefix) --exec-prefix $(exec_prefix) \
 						--bindir $(bindir) --sbindir $(sbindir) \
@@ -157,30 +159,30 @@ ifneq (,@host_alias@)
 endif 
 
 ifneq (,@target_alias@)
-	HOST_CONFIGURE_OPTS += --build $(target_alias)
+	HOST_CONFIGURE_OPTS += --target $(target_alias)
 endif 
 
 TARGET_DEFS = $(BASE_DEFS) \
-				CC_FOR_BUILD=$(CC); export CC_FOR_BUILD; \
-				CFLAGS_FOR_BUILD=$(CFLAGS); export CFLAGS_FOR_BUILD; \
-				CC=$(CC_FOR_TARGET); export CC; \
-				CFLAGS=$(CFLAGS_FOR_TARGET); export CFLAGS; \
-				CXX_FOR_BUILD=$(CXX); export CXX_FOR_BUILD; \
-				CXXFLAGS_FOR_BUILD=$(CXXFLAGS); export CXXFLAGS_FOR_BUILD; \
-				CXX=$(CXX_FOR_TARGET); export CXX; \
-				CFLAGS=$(CXXFLAGS_FOR_TARGET); export CXXFLAGS; \
-				RUSTC_FOR_BUILD=$(RUSTC); export RUSTC_FOR_BUILD; \
-				RUSTFLAGS_FOR_BUILD=$(CFLAGS); export RUSTFLAGS_FOR_BUILD; \
-				RUSTC=$(RUSTC_FOR_TARGET); export RUSTC; \
-				RUSTFLAGS=$(CFLAGS_FOR_TARGET); export RUSTFLAGS; \
-				AR=$(AR_FOR_TARGET); export AR; \
-				AS=$(AS_FOR_TARGET); export AS; \
-				OBJCOPY=$(OBJCOPY_FOR_TARGET); export OBJCOPY; \
-				LD=$(LD_FOR_TARGET); export LD; \
-				prefix=$(sysroot); export prefix; \
-				exec_prefix=$(sysroot); export exec_prefix; \
-				libdir=$(target_libdir); export libdir; \
-				includedir=$(target_includedir); export includedir
+				CC_FOR_BUILD="$(CC)"; export CC_FOR_BUILD; \
+				CFLAGS_FOR_BUILD="$(CFLAGS)"; export CFLAGS_FOR_BUILD; \
+				CC="$(CC_FOR_TARGET)"; export CC; \
+				CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+				CXX_FOR_BUILD="$(CXX)"; export CXX_FOR_BUILD; \
+				CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"; export CXXFLAGS_FOR_BUILD; \
+				CXX="$(CXX_FOR_TARGET)"; export CXX; \
+				CFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+				RUSTC_FOR_BUILD="$(RUSTC)"; export RUSTC_FOR_BUILD; \
+				RUSTFLAGS_FOR_BUILD="$(CFLAGS)"; export RUSTFLAGS_FOR_BUILD; \
+				RUSTC="$(RUSTC_FOR_TARGET)"; export RUSTC; \
+				RUSTFLAGS="$(CFLAGS_FOR_TARGET)"; export RUSTFLAGS; \
+				AR="$(AR_FOR_TARGET)"; export AR; \
+				AS="$(AS_FOR_TARGET)"; export AS; \
+				OBJCOPY="$(OBJCOPY_FOR_TARGET)"; export OBJCOPY; \
+				LD="$(LD_FOR_TARGET)"; export LD; \
+				prefix="$(sysroot)"; export prefix; \
+				exec_prefix="$(sysroot)"; export exec_prefix; \
+				libdir="$(target_libdir)"; export libdir; \
+				includedir="$(target_includedir)"; export includedir
 
 TARGET_CONFIGURE_OPTS = --prefix $(sysroot) --exec-prefix $(sysroot) --libdir $(target_libdir) --includedir $(target_includedir)
 
@@ -189,7 +191,7 @@ ifneq (,@host_alias@)
 endif
 
 ifneq (,@target_alias@)
-	TARGET_CONFIGURE_OPTIONS += --host ${target_alias}
+	TARGET_CONFIGURE_OPTS += --host ${target_alias}
 endif
 
 
@@ -198,21 +200,21 @@ endif
 all: stage2
 
 .PHONY: all stage0 stage1 stage2 clean distclean check install install-strip \
-	$(foreach targ,all check clean distclean install install-strip,$(HOST_DIRS:%/=%/$(target))) \
-	$(foreach targ,all check clean distclean install install-strip,$(HOST_DIRS:%/=%/$(target)))
+	$(foreach targ,all check clean distclean install install-strip,$(foreach host_dir,$(HOST_DIRS),$(host_dir)/$(target))) \
+	$(foreach targ,all check clean distclean install install-strip,$(foreach target_dir,$(TARGET_DIRS),$(target_dir)/$(target)))
 
 .ONESHELL:
 
-clean: $(HOST_DIRS:%/=%/clean) $(TARGET_DIRS:%/=%/clean)
+clean: $(foreach host_dir,$(HOST_DIRS),$(host_dir)/clean) $(foreach target_dir,$(TARGET_DIRS),$(target_dir)/clean)
 
 distclean: # $(HOST_DIRS:%/=%/distclean) $(TARGET_DIRS:%/=%/distclean) # binutils and gcc distclean is borked. THe directories need to be deleted anyways, so just rm them
 	rm -rf Makefile config.status config.cache $(HOST_DIRS) $(TARGET_DIRS)
 
-check: $(HOST_DIRS:%/=%/check) $(TARGET_DIRS:%/=%/check)
+check: $(foreach host_dir,$(HOST_DIRS),$(host_dir)/check) $(foreach target_dir,$(TARGET_DIRS),$(target_dir)/check)
 
-install: $(HOST_DIRS:%/=%/install) $(TARGET_DIRS:%/=%/install)
+install: $(foreach host_dir,$(HOST_DIRS),$(host_dir)/install) $(foreach target_dir,$(TARGET_DIRS),$(target_dir)/install)
 
-install-strip: $(HOST_DIRS:%/=%/install-strip) $(TARGET_DIRS:%/=%/install-strip)
+install-strip: $(foreach host_dir,$(HOST_DIRS),$(host_dir)/install-strip) $(foreach target_dir,$(TARGET_DIRS),$(target_dir)/install-strip)
 
 # Macros for configure and all
 
@@ -223,7 +225,7 @@ install-strip: $(HOST_DIRS:%/=%/install-strip) $(TARGET_DIRS:%/=%/install-strip)
 configure-[+module+]: 
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	[+exports+] \
+	[+exports+]; \
 	cd [+module+] || exit 1; \
 	$(SHELL) @abs_srcdir@/[+module+]/configure --srcdir=../$(srcdir)/[+module+] [+configure_flags+] [+extra_configure_flags+]
 
@@ -233,7 +235,9 @@ configure-[+module+]:
 
 .PHONY: [+module+]/all [+module+]/clean [+module+]/check [+module+]/install [+module+]/install-strip 
 
-[+module+]/all: [+module+]/Makefile
+.PRECIOUS: [+module+]/config.sub
+
+[+module+]/all: [+module+]/
 	+@[+exports+]
 	$(MAKE) -C [+module+] all
 
@@ -276,19 +280,19 @@ stage0:
 # stage1 targets (host)
 
 [+ FOR host_modules +]
-[+ configure exports="$(HOST_EXPORTS)" configure_flags="$(HOST_CONFIGURE_OPTS)" +]
-[+ targs exports="$(HOST_EXPORTS)" +]
+[+ configure exports="$(HOST_DEFS)" configure_flags="$(HOST_CONFIGURE_OPTS)" +]
+[+ targs exports="$(HOST_DEFS)" +]
 [+ ENDFOR +]
 
 stage1: stage0
-	+$(MAKE) $(HOST_DIRS:%/=%/all)
+	+$(MAKE) $(HOST_DIRS:%=%/all)
 
 # stage2 targets (target)
 
 stage2: stage1
-	+$(MAKE) $(TARGET_DIRS:%/=%/all)
+	+$(MAKE) $(TARGET_DIRS:%=%/all)
 
 [+ FOR target_modules +]
-[+ configure exports="$(TARGET_EXPORTS)"  configure_flags="$(HOST_CONFIGURE_OPTS)" +]
-[+ targs exports="$(TARGET_EXPORTS)" +]
+[+ configure exports="${TARGET_DEFS}"  configure_flags="$(TARGET_CONFIGURE_OPTS)" +]
+[+ targs exports="$(TARGET_DEFS)" +]
 [+ ENDFOR +]

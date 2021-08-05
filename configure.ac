@@ -37,7 +37,7 @@ case x$target in
     xw65-* )
         ;;
     * )
-        AC_MSG_ERROR([Cannot build SNES-Dev for target $noncanonical_target])
+        AC_MSG_ERROR([Cannot build SNES-Dev for target $target_noncanonical])
         ;;
 esac
 
@@ -56,7 +56,7 @@ LCRUST_PROG_RUSTC
 LCRUST_RUSTC_VERSION
 
 AX_PROG_CC_FOR_BUILD
-AX_PROG_RUSTC_FOR_BUILD
+AX_PROG_CXX_FOR_BUILD
 LCRUST_PROG_RUSTC_FOR_BUILD
 LCRUST_RUSTC_VERSION_FOR_BUILD
 
@@ -76,7 +76,7 @@ AC_MSG_CHECKING([for cc to use with $target_noncanonical])
 if test "$CC_FOR_TARGET" \= ""
 then
     AC_MSG_RESULT([just compiled])
-    CC_FOR_TARGET="$abs_builddir/gcc/gcc/xgcc"
+    CC_FOR_TARGET='${abs_builddir}/gcc/gcc/xgcc'
 else
     AC_MSG_RESULT([$CC_FOR_TARGET])
 fi
@@ -86,7 +86,7 @@ AC_MSG_CHECKING([for c++ to use with $target_noncanonical])
 if test "$CXX_FOR_TARGET" \= ""
 then
     AC_MSG_RESULT([just compiled])
-    CXX_FOR_TARGET="$abs_builddir/gcc/gcc/xg++"
+    CXX_FOR_TARGET='${abs_builddir}/gcc/gcc/xg++'
 else
     AC_MSG_RESULT([$CXX_FOR_TARGET])
 fi
@@ -96,7 +96,7 @@ AC_MSG_CHECKING([for as to use with $target_noncanonical])
 if test "$AS_FOR_TARGET" \= ""
 then
     AC_MSG_RESULT([just compiled])
-    AS_FOR_TARGET="$abs_builddir/binutils-gdb/gas/as-new"
+    AS_FOR_TARGET='${abs_builddir}/binutils-gdb/gas/as-new'
 else
     AC_MSG_RESULT([$AS_FOR_TARGET])
 fi
@@ -106,7 +106,7 @@ AC_MSG_CHECKING([for ar to use with $target_noncanonical])
 if test "$AR_FOR_TARGET" \= ""
 then
     AC_MSG_RESULT([just compiled])
-    AR_FOR_TARGET="$abs_builddir/binutils-gdb/binutils/ar-new"
+    AR_FOR_TARGET='${abs_builddir}/binutils-gdb/binutils/ar'
 else
     AC_MSG_RESULT([$AR_FOR_TARGET])
 fi
@@ -116,7 +116,7 @@ AC_MSG_CHECKING([for ld to use with $target_noncanonical])
 if test "$LD_FOR_TARGET" \= ""
 then
     AC_MSG_RESULT([just compiled])
-    LD_FOR_TARGET="$abs_builddir/binutils-gdb/ld/ld-new"
+    LD_FOR_TARGET='${abs_builddir}/binutils-gdb/ld/ld-new'
 else
     AC_MSG_RESULT([$LD_FOR_TARGET])
 fi
@@ -126,28 +126,27 @@ AC_MSG_CHECKING([for objcopy to use with $target_noncanonical])
 if test "$OBJCOPY_FOR_TARGET" \= ""
 then
     AC_MSG_RESULT([just compiled])
-    OBJCOPY_FOR_TARGET="$abs_builddir/binutils-gdb/binutils/objcopy-new"
+    OBJCOPY_FOR_TARGET='${abs_builddir}/binutils-gdb/binutils/objcopy'
 else
     AC_MSG_RESULT([$OBJCOPY_FOR_TARGET])
 fi
 
 RUSTFLAGS_FOR_TARGET="$RUSTFLAGS_FOR_TARGET --target $target"
 
-
+AC_MSG_CHECKING([where to install libraries for $taret_noncanonical])
 AC_ARG_WITH([sysroot],[
     Set the sysroot to for binutils and gcc, and also the installation prefix for libraries
 ],[
-    case "$withval" in
-        "/*" )
-            sysroot = "$withval"
-        ;;
-        "*" )
-            sysroot = "$${prefix}/$sysroot"
-        ;;
-    esac
+    sysroot="$withval"
 ],[
-    sysroot="$${prefix}/$noncanonical_target"
+    sysroot="$${prefix}/$target_noncanonical"
 ])
+
+AC_MSG_RESULT([$sysroot])
+AC_SUBST([sysroot])
+
+
+
 
 AC_ARG_ENABLE([float],[
     Enable Float support in qc and libc
@@ -204,13 +203,14 @@ AC_ARG_ENABLE([qc],[
         xno )
             ;;
     esac
+],[
+    target_dirs="$target_dirs qc"
 ])
 
 AC_SUBST([host_dirs])
 AC_SUBST([target_dirs])
-AC_SUBST([sysroot])
-AC_SUBST([int128])
-AC_SUBST([float])
+AC_SUBST([int128_support])
+AC_SUBST([float_support])
 
 
 AC_CONFIG_FILES([Makefile])
