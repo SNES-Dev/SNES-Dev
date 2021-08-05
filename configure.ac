@@ -34,8 +34,10 @@ esac
 
 AC_PROG_INSTALL
 
+AC_ARG_WITH([sysroot],[
+    Set the sysroot to for binutils and gcc, and also the installation prefix for libraries
+])
 
-
-
+AC_CONFIG_SUBDIRS([binutils-gdb])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

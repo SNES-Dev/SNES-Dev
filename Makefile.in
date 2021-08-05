@@ -1,0 +1,65 @@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+libdir = @libdir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+
+sysroot = @sysroot@
+
+all:
+    +$(MAKE) binutils-gdb/all
+    +$(MAKE) qc/all
+
+binutils-gdb/config.status: @srcdir@/binutils-gdb/configure
+    cd binutils-gdb && ./config.status --recheck
+
+binutils-gdb/Makefile: binutils-gdb/config.status
+    cd binutils-gdb && ./config.status Makefile
+
+binutils-gdb/all: binutils-gdb/Makefile
+    make -C binutils-gdb
+
+binutils-gdb/install: binutils-gdb/Makefile
+    make -C binutils-gdb install
+
+binutils-gdb/install-strip: binutils-gdb/Makefile
+    make -C binutils-gdb install-strip
+
+binutils-gdb/clean: binutils-gdb/Makefile
+    make -C binutils-gdb clean
+
+binutils-gdb/distclean: binutils-gdb/Makefile
+    make -C binutils-gdb distclean
+
+binutils-gdb/check: binutils-gdb/Makefile
+    make -C binutils-gdb check
+
+qc/config.status: @srcdir@/binutils-gdb/configure
+    [ -d qc ] || mkdir qc && cd qc && ../configure --host @noncanonical_target@ --prefix $(sysroot) --enable-float=@float_support@ --enable-int128=@int128_support@
+    cd qc && ./config.status --recheck
+
+qc/Makefile: binutils-gdb/config.status
+    cd qc && ./config.status Makefile
+
+qc/all: binutils-gdb/Makefile
+    make -C qc
+
+qc/install: binutils-gdb/Makefile
+    make -C qc install
+
+qc/install-strip: binutils-gdb/Makefile
+    make -C qc install-strip
+
+qc/clean: binutils-gdb/Makefile
+    make -C qc clean
+
+qc/distclean: binutils-gdb/Makefile
+    make -C qc distclean
+
+qc/check: binutils-gdb/Makefile
+    make -C qc check
+
+install:
+    
