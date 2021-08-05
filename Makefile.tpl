@@ -1,3 +1,6 @@
+[+ AutoGen5 template -*- Mode: Makefile -*-
+in
++]
 
 # Overridable Programs
 
@@ -213,9 +216,57 @@ install-strip: $(HOST_DIRS:%/=%/install-strip) $(TARGET_DIRS:%/=%/install-strip)
 
 # Macros for configure and all
 
+[+ DEFINE configure +]
+
+.PHONY: configure-[+module+]
+
+configure-[+module+]: 
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	[+exports+] \
+	cd [+module+] || exit 1; \
+	$(SHELL) @abs_srcdir@/[+module+]/configure --srcdir=../$(srcdir)/[+module+] [+configure_flags+] [+extra_configure_flags+]
+
+[+ ENDDEF +]
+
+[+ DEFINE targs +]
+
+.PHONY: [+module+]/all [+module+]/clean [+module+]/check [+module+]/install [+module+]/install-strip 
+
+[+module+]/all: [+module+]/Makefile
+	+@[+exports+]
+	$(MAKE) -C [+module+] all
+
+[+module+]/:
+	+@[+exports+]
+	$(MKDIR_P) [+module+]/
+	$(MAKE) configure-[+module+]
+
+[+module+]/config.status: [+module+]/
+	@[+exports+]
+	cd [+module+]; ./config.status --recheck
+
+[+module+]/Makefile: [+module+]/config.status $(srcdir)/[+module+]/Makefile.in
+	@[+exports+]
+	cd [+module+]; ./config.status Makefile
+
+[+module+]/clean:
+	+@[+exports+]
+	$(MAKE) -C [+module+] clean
+
+[+module+]/check:
+	+@[+exports+]
+	$(MAKE) -C [+module+] check
+
+[+module+]/install:
+	+@[+exports+]
+	$(MAKE) -C [+module+] install
+
+[+module+]/install-strip:
+	+@[+exports+]; $(MAKE) -C [+module+] install-strip
 
 
-
+[+ ENDDEF +]
 
 
 # stage0 targets (build)
@@ -224,109 +275,10 @@ stage0:
 
 # stage1 targets (host)
 
-
-
-
-.PHONY: configure-binutils-gdb
-
-configure-binutils-gdb: 
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(HOST_EXPORTS) \
-	cd binutils-gdb || exit 1; \
-	$(SHELL) @abs_srcdir@/binutils-gdb/configure --srcdir=../$(srcdir)/binutils-gdb $(HOST_CONFIGURE_OPTS) --with-sysroot=$(sysroot)
-
-
-
-
-.PHONY: binutils-gdb/all binutils-gdb/clean binutils-gdb/check binutils-gdb/install binutils-gdb/install-strip 
-
-binutils-gdb/all: binutils-gdb/Makefile
-	+@$(HOST_EXPORTS)
-	$(MAKE) -C binutils-gdb all
-
-binutils-gdb/:
-	+@$(HOST_EXPORTS)
-	$(MKDIR_P) binutils-gdb/
-	$(MAKE) configure-binutils-gdb
-
-binutils-gdb/config.status: binutils-gdb/
-	@$(HOST_EXPORTS)
-	cd binutils-gdb; ./config.status --recheck
-
-binutils-gdb/Makefile: binutils-gdb/config.status $(srcdir)/binutils-gdb/Makefile.in
-	@$(HOST_EXPORTS)
-	cd binutils-gdb; ./config.status Makefile
-
-binutils-gdb/clean:
-	+@$(HOST_EXPORTS)
-	$(MAKE) -C binutils-gdb clean
-
-binutils-gdb/check:
-	+@$(HOST_EXPORTS)
-	$(MAKE) -C binutils-gdb check
-
-binutils-gdb/install:
-	+@$(HOST_EXPORTS)
-	$(MAKE) -C binutils-gdb install
-
-binutils-gdb/install-strip:
-	+@$(HOST_EXPORTS); $(MAKE) -C binutils-gdb install-strip
-
-
-
-
-
-
-.PHONY: configure-gcc
-
-configure-gcc: 
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(HOST_EXPORTS) \
-	cd gcc || exit 1; \
-	$(SHELL) @abs_srcdir@/gcc/configure --srcdir=../$(srcdir)/gcc $(HOST_CONFIGURE_OPTS) --with-sysroot=$(sysroot) --without-headers --with-newlib --disable-libstdcxx --disable-libvtv --disable-libssp --disable-libgomp --enable-languages=$(languages) --enable-shared=$(gcc_shared)
-
-
-
-
-.PHONY: gcc/all gcc/clean gcc/check gcc/install gcc/install-strip 
-
-gcc/all: gcc/Makefile
-	+@$(HOST_EXPORTS)
-	$(MAKE) -C gcc all
-
-gcc/:
-	+@$(HOST_EXPORTS)
-	$(MKDIR_P) gcc/
-	$(MAKE) configure-gcc
-
-gcc/config.status: gcc/
-	@$(HOST_EXPORTS)
-	cd gcc; ./config.status --recheck
-
-gcc/Makefile: gcc/config.status $(srcdir)/gcc/Makefile.in
-	@$(HOST_EXPORTS)
-	cd gcc; ./config.status Makefile
-
-gcc/clean:
-	+@$(HOST_EXPORTS)
-	$(MAKE) -C gcc clean
-
-gcc/check:
-	+@$(HOST_EXPORTS)
-	$(MAKE) -C gcc check
-
-gcc/install:
-	+@$(HOST_EXPORTS)
-	$(MAKE) -C gcc install
-
-gcc/install-strip:
-	+@$(HOST_EXPORTS); $(MAKE) -C gcc install-strip
-
-
-
-
+[+ FOR host_modules +]
+[+ configure exports="$(HOST_EXPORTS)" configure_flags="$(HOST_CONFIGURE_OPTS)" +]
+[+ targs exports="$(HOST_EXPORTS)" +]
+[+ ENDFOR +]
 
 stage1: stage0
 	+$(MAKE) $(HOST_DIRS:%/=%/all)
@@ -336,55 +288,7 @@ stage1: stage0
 stage2: stage1
 	+$(MAKE) $(TARGET_DIRS:%/=%/all)
 
-
-
-
-.PHONY: configure-qc
-
-configure-qc: 
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(TARGET_EXPORTS) \
-	cd qc || exit 1; \
-	$(SHELL) @abs_srcdir@/qc/configure --srcdir=../$(srcdir)/qc $(HOST_CONFIGURE_OPTS) 
-
-
-
-
-.PHONY: qc/all qc/clean qc/check qc/install qc/install-strip 
-
-qc/all: qc/Makefile
-	+@$(TARGET_EXPORTS)
-	$(MAKE) -C qc all
-
-qc/:
-	+@$(TARGET_EXPORTS)
-	$(MKDIR_P) qc/
-	$(MAKE) configure-qc
-
-qc/config.status: qc/
-	@$(TARGET_EXPORTS)
-	cd qc; ./config.status --recheck
-
-qc/Makefile: qc/config.status $(srcdir)/qc/Makefile.in
-	@$(TARGET_EXPORTS)
-	cd qc; ./config.status Makefile
-
-qc/clean:
-	+@$(TARGET_EXPORTS)
-	$(MAKE) -C qc clean
-
-qc/check:
-	+@$(TARGET_EXPORTS)
-	$(MAKE) -C qc check
-
-qc/install:
-	+@$(TARGET_EXPORTS)
-	$(MAKE) -C qc install
-
-qc/install-strip:
-	+@$(TARGET_EXPORTS); $(MAKE) -C qc install-strip
-
-
-
-
+[+ FOR target_modules +]
+[+ configure exports="$(TARGET_EXPORTS)"  configure_flags="$(HOST_CONFIGURE_OPTS)" +]
+[+ targs exports="$(TARGET_EXPORTS)" +]
+[+ ENDFOR +]
