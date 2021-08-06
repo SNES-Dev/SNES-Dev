@@ -588,6 +588,7 @@ float_support
 int128_support
 target_dirs
 host_dirs
+build_dirs
 sysroot
 OBJCOPY_FOR_TARGET
 LD_FOR_TARGET
@@ -599,6 +600,7 @@ CXXFLAGS_FOR_TARGET
 CXX_FOR_TARGET
 CFLAGS_FOR_TARGET
 CC_FOR_TARGET
+AR_FOR_BUILD
 build_rust_patch
 build_rust_minor
 build_rust_major
@@ -2185,6 +2187,12 @@ case x$target in
         as_fn_error $? "Cannot build SNES-Dev for target $target_noncanonical" "$LINENO" 5
         ;;
 esac
+
+if test x${build_noncanonical} != x${host_noncanonical}
+then
+    # We are cross compiling, so make sure to use toolchains for the build target
+    toolchain_prefix="${build_noncanonical}-"
+fi
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -5955,6 +5963,53 @@ $as_echo "$build_rustc_is_lccc" >&6; }
 
 
 
+for ac_prog in ar ${build_noncanonical}-ar
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_AR_FOR_BUILD+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $AR_FOR_BUILD in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_AR_FOR_BUILD="$AR_FOR_BUILD" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_AR_FOR_BUILD="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+AR_FOR_BUILD=$ac_cv_path_AR_FOR_BUILD
+if test -n "$AR_FOR_BUILD"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AR_FOR_BUILD" >&5
+$as_echo "$AR_FOR_BUILD" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$AR_FOR_BUILD" && break
+done
+
+
+
 
 
 
@@ -5973,7 +6028,7 @@ if test "$CC_FOR_TARGET" \= ""
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: just compiled" >&5
 $as_echo "just compiled" >&6; }
-    CC_FOR_TARGET='${abs_builddir}/gcc/gcc/xgcc'
+    CC_FOR_TARGET="\${abs_builddir}/${toolchain_prefix}gcc/gcc/xgcc"
 else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC_FOR_TARGET" >&5
 $as_echo "$CC_FOR_TARGET" >&6; }
@@ -5986,7 +6041,7 @@ if test "$CXX_FOR_TARGET" \= ""
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: just compiled" >&5
 $as_echo "just compiled" >&6; }
-    CXX_FOR_TARGET='${abs_builddir}/gcc/gcc/xg++'
+    CXX_FOR_TARGET="\${abs_builddir}/${toolchain_prefix}gcc/gcc/xg++"
 else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX_FOR_TARGET" >&5
 $as_echo "$CXX_FOR_TARGET" >&6; }
@@ -5999,7 +6054,7 @@ if test "$AS_FOR_TARGET" \= ""
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: just compiled" >&5
 $as_echo "just compiled" >&6; }
-    AS_FOR_TARGET='${abs_builddir}/binutils-gdb/gas/as-new'
+    AS_FOR_TARGET="\${abs_builddir}/${toolchain_prefix}binutils-gdb/gas/as-new"
 else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AS_FOR_TARGET" >&5
 $as_echo "$AS_FOR_TARGET" >&6; }
@@ -6012,7 +6067,7 @@ if test "$AR_FOR_TARGET" \= ""
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: just compiled" >&5
 $as_echo "just compiled" >&6; }
-    AR_FOR_TARGET='${abs_builddir}/binutils-gdb/binutils/ar'
+    AR_FOR_TARGET="\${abs_builddir}/${toolchain_prefix}binutils-gdb/binutils/ar"
 else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AR_FOR_TARGET" >&5
 $as_echo "$AR_FOR_TARGET" >&6; }
@@ -6025,7 +6080,7 @@ if test "$LD_FOR_TARGET" \= ""
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: just compiled" >&5
 $as_echo "just compiled" >&6; }
-    LD_FOR_TARGET='${abs_builddir}/binutils-gdb/ld/ld-new'
+    LD_FOR_TARGET="\${abs_builddir}/${toolchain_prefix}binutils-gdb/ld/ld-new"
 else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LD_FOR_TARGET" >&5
 $as_echo "$LD_FOR_TARGET" >&6; }
@@ -6038,7 +6093,7 @@ if test "$OBJCOPY_FOR_TARGET" \= ""
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: just compiled" >&5
 $as_echo "just compiled" >&6; }
-    OBJCOPY_FOR_TARGET='${abs_builddir}/binutils-gdb/binutils/objcopy'
+    OBJCOPY_FOR_TARGET="\${abs_builddir}/${toolchain_prefix}binutils-gdb/binutils/objcopy"
 else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $OBJCOPY_FOR_TARGET" >&5
 $as_echo "$OBJCOPY_FOR_TARGET" >&6; }
@@ -6056,7 +6111,7 @@ if test "${with_sysroot+set}" = set; then :
 
 else
 
-    sysroot="$${prefix}/$target_noncanonical"
+    sysroot='${prefix}/'"$target_noncanonical"
 
 fi
 
@@ -6098,6 +6153,10 @@ if test "${enable_binutils+set}" = set; then :
     case x$enableval in
         xyes )
             host_dirs="$host_dirs binutils-gdb"
+            if test x${build_noncanonical} != x${host_noncanonical}
+            then
+                build_dirs="$build_dirs ${build_noncanonical}-binutils-gdb"
+            fi
             ;;
         xno )
             ;;
@@ -6106,6 +6165,10 @@ if test "${enable_binutils+set}" = set; then :
 else
 
     host_dirs="$host_dirs binutils-gdb"
+    if test x${build_noncanonical} != x${host_noncanonical}
+    then
+        build_dirs="$build_dirs ${build_noncanonical}-binutils-gdb"
+    fi
 
 fi
 
@@ -6116,6 +6179,10 @@ if test "${enable_gcc+set}" = set; then :
     case x$enableval in
         xyes )
             host_dirs="$host_dirs gcc"
+            if test x${build_noncanonical} != x${host_noncanonical}
+            then
+                build_dirs="$build_dirs ${build_noncanonical}-gcc"
+            fi
             ;;
         xno )
             ;;
@@ -6141,6 +6208,7 @@ else
     target_dirs="$target_dirs qc"
 
 fi
+
 
 
 

@@ -32,8 +32,9 @@ RUSTC_FOR_BUILD := @RUSTC_FOR_BUILD@
 RUSTFLAGS_FOR_BUILD := @RUSTFLAGS_FOR_BUILD@
 CC_FOR_BUILD := @CC_FOR_BUILD@
 CFLAGS_FOR_BUILD := @CFLAGS_FOR_BUILD@
-CXX_FOR_BUILD := @CXX_FOR_BUILDS@
+CXX_FOR_BUILD := @CXX_FOR_BUILD@
 CXXFLAGS_FOR_BUILD := @CXXFLAGS_FOR_BUILD@
+AR_FOR_BUILD := @AR_FOR_BUILD@
 
 RUSTC_FOR_TARGET = @RUSTC_FOR_TARGET@
 RUSTFLAGS_FOR_TARGET = @RUSTFLAGS_FOR_TARGET@
@@ -94,8 +95,10 @@ target_includedir := ${sysroot}/include
 
 # Package Variables
 
+BUILD_DIRS = @build_dirs@
 HOST_DIRS = @host_dirs@
 TARGET_DIRS = @target_dirs@
+
 
 BASE_DEFS = INSTALL="$(INSTALL)"; export INSTALL; \
 			INSTALL_PROGRAM="$(INSTALL_PROGRAM)"; export INSTALL_PROGRAM; \
@@ -104,6 +107,60 @@ BASE_DEFS = INSTALL="$(INSTALL)"; export INSTALL; \
 			GREP="$(GREP)"; export GREP; \
 			AWK="$(AWK)"; export AWK; \
 			SED="$(SED)"; export SED; 
+
+BUILD_DEFS = $(BASE_DEFS) \
+			CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+			CFLAGS_FOR_BUILD="$(CFLAGS_FOR_BUILD)"; export CFLAGS_FOR_BUILD; \
+			CC="$(CC_FOR_BUILD)"; export CC; \
+			CFLAGS="$(CFLAGS_FOR_BUILD)"; export CFLAGS; \
+			CXX_FOR_BUILD="$(CXX_FOR_BUILD)"; export CX_FOR_BUILD; \
+			CXXFLAGS_FOR_BUILD="$(CFLAGS_FOR_BUILD)"; export CXXFLAGS_FOR_BUILD; \
+			CXX="$(CXX_FOR_BUILD)"; export CXX; \
+			CXXFLAGS="$(CXXFLAGS_FOR_BUILD)"; export CXXFLAGS; \
+			RUSTC_FOR_BUILD="$(RUSTC_FOR_BUILD)"; export RUSTC_FOR_BUILD; \
+			RUSTFLAGS_FOR_BUILD="$(RUSTFLAGS_FOR_BUILD)"; export RUSTFLAGS_FOR_BUILD; \
+			RUSTC="$(RUSTC_FOR_BUILD)"; export RUSTC; \
+			RUSTFLAGS="$(RUSTFLAGS_FOR_BUILD)"; export RUSTFLAGS; \
+			AR="$(AR_FOR_BUILD)"; export AR; \
+			prefix="$(prefix)"; export prefix; \
+			exec_prefix="$(exec_prefix)"; export exec_prefix; \
+			bindir="$(bindir)"; export bindir; \
+			sbindir="$(sbindir)"; export sbindir; \
+			libexec="$(libexecdir)"; export libexecdir; \
+			libdir="$(libdir)"; export libdir; \
+			includedir="$(includedir)"; export includedir; \
+			datarootdir=$(datarootdir); export datarootdir; \
+			datadir="$(datadir)"; export datadir; \
+			docdir="$(docdir)"; export docdir; \
+			mandir="$(mandir)"; export mandir; \
+			infodir="$(infodir)"; export infodir; \
+			htmldir="$(htmldir)"; export htmldir; \
+			dvidir="$(dvidir)"; export dvidir; \
+			pdfdir="$(pdfdir)"; export pdfdir; \
+			localedir="$(localedir)"; export localedir; \
+			sysconfdir="$(sysconfdir)"; export sysconfdir; \
+			sharedstatedir="$(sharedstatedir)"; export sharedstatedir; \
+			localstatedir="$(localstatedir)"; export localstatedir
+
+
+BUILD_CONFIGURE_OPTS = --prefix $(prefix) --exec-prefix $(exec_prefix) \
+						--bindir $(bindir) --sbindir $(sbindir) \
+						--libexecdir $(libexecdir) --libdir $(libdir) \
+						--includedir $(includedir) --datarootdir $(datarootdir) \
+						--datadir $(datadir) --docdir $(docdir) \
+						--dvidir $(dvidir) --htmldir $(htmldir) \
+						--pdfdir $(pdfdir) --mandir $(mandir) \
+						--infodir $(infodir) --localedir $(localedir) \
+						--sysconfdir $(sysconfdir) --sharedstatedir $(sharedstatedir) \
+						--localstatedir $(localstatedir) 
+
+ifneq (,@build_alias@)
+	HOST_CONFIGURE_OPTS += --build $(build_alias) --host $(build_alias)
+endif
+
+ifneq (,@target_alias@)
+	HOST_CONFIGURE_OPTIONS += --target $(target_alias)
+endif
 
 HOST_DEFS =	$(BASE_DEFS) \
 			CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
@@ -200,6 +257,7 @@ endif
 all: stage2
 
 .PHONY: all stage0 stage1 stage2 clean distclean check install install-strip \
+$(foreach targ,all check clean distclean install install-strip,$(foreach build_dir,$(BUILD_DIRS),$(build_dir)/$(target))) \
 	$(foreach targ,all check clean distclean install install-strip,$(foreach host_dir,$(HOST_DIRS),$(host_dir)/$(target))) \
 	$(foreach targ,all check clean distclean install install-strip,$(foreach target_dir,$(TARGET_DIRS),$(target_dir)/$(target)))
 
@@ -220,54 +278,54 @@ install-strip: $(foreach host_dir,$(HOST_DIRS),$(host_dir)/install-strip) $(fore
 
 [+ DEFINE configure +]
 
-.PHONY: configure-[+module+]
+.PHONY: configure-[+prefix+][+module+]
 
-configure-[+module+]: 
+configure-[+prefix+][+module+]: 
 	@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	[+exports+]; \
-	cd [+module+] || exit 1; \
+	cd [+prefix+][+module+] || exit 1; \
 	$(SHELL) @abs_srcdir@/[+module+]/configure --srcdir=../$(srcdir)/[+module+] [+configure_flags+] [+extra_configure_flags+]
 
 [+ ENDDEF +]
 
 [+ DEFINE targs +]
 
-.PHONY: [+module+]/all [+module+]/clean [+module+]/check [+module+]/install [+module+]/install-strip 
+.PHONY: [+prefix+][+module+]/all [+prefix+][+module+]/clean [+prefix+][+module+]/check [+prefix+][+module+]/install [+prefix+][+module+]/install-strip 
 
-.PRECIOUS: [+module+]/config.sub
+.PRECIOUS: [+prefix+][+module+]/config.sub
 
-[+module+]/all: [+module+]/
+[+prefix+][+module+]/all: [+prefix+][+module+]/
 	+@[+exports+]
-	$(MAKE) -C [+module+] all
+	$(MAKE) -C [+prefix+][+module+] all
 
-[+module+]/:
+[+prefix+][+module+]/:
 	+@[+exports+]
-	$(MKDIR_P) [+module+]/
-	$(MAKE) configure-[+module+]
+	$(MKDIR_P) [+prefix+][+module+]/
+	$(MAKE) configure-[+prefix+][+module+]
 
-[+module+]/config.status: [+module+]/
+[+prefix+][+module+]/config.status: [+prefix+][+module+]/
 	@[+exports+]
-	cd [+module+]; ./config.status --recheck
+	cd [+prefix+][+module+]; ./config.status --recheck
 
-[+module+]/Makefile: [+module+]/config.status $(srcdir)/[+module+]/Makefile.in
+[+prefix+][+module+]/Makefile: [+prefix+][+module+]/config.status $(srcdir)/[+module+]/Makefile.in
 	@[+exports+]
-	cd [+module+]; ./config.status Makefile
+	cd [+prefix+][+module+]; ./config.status Makefile
 
-[+module+]/clean:
+[+prefix+][+module+]/clean:
 	+@[+exports+]
-	$(MAKE) -C [+module+] clean
+	$(MAKE) -C [+prefix+][+module+] clean
 
-[+module+]/check:
+[+prefix+][+module+]/check:
 	+@[+exports+]
-	$(MAKE) -C [+module+] check
+	$(MAKE) -C [+prefix+][+module+] check
 
-[+module+]/install:
+[+prefix+][+module+]/install:
 	+@[+exports+]
-	$(MAKE) -C [+module+] install
+	$(MAKE) -C [+prefix+][+module+] install
 
-[+module+]/install-strip:
-	+@[+exports+]; $(MAKE) -C [+module+] install-strip
+[+prefix+][+module+]/install-strip:
+	+@[+exports+]; $(MAKE) -C [+prefix+][+module+] install-strip
 
 
 [+ ENDDEF +]
@@ -276,6 +334,14 @@ configure-[+module+]:
 # stage0 targets (build)
 
 stage0:
+ifneq (,$(BUILD_DIRS))
+	+$(MAKE) $(BUILD_DIRS:%=%/all)
+endif
+
+[+ FOR build_modules +]
+[+ configure exports="$(BUILD_DEFS)" configure_flags="$(BUILD_CONFIGURE_OPTS)" prefix="@build_noncanonical@-" +]
+[+ targs exports="$(BUILD_DEFS)" prefix="@build_noncanonical@-" +]
+[+ ENDFOR +]
 
 # stage1 targets (host)
 
@@ -285,12 +351,16 @@ stage0:
 [+ ENDFOR +]
 
 stage1: stage0
+ifneq (,$(HOST_DIRS))
 	+$(MAKE) $(HOST_DIRS:%=%/all)
+endif
 
 # stage2 targets (target)
 
 stage2: stage1
+ifneq (,$(TARGET_DIRS))
 	+$(MAKE) $(TARGET_DIRS:%=%/all)
+endif
 
 [+ FOR target_modules +]
 [+ configure exports="${TARGET_DEFS}"  configure_flags="$(TARGET_CONFIGURE_OPTS)" +]
