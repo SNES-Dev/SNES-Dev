@@ -24,9 +24,13 @@ jobs:
       run: |
           mkdir -pv ${{runner.workspace}}/build
     - name: Configure
-      working-directory: 
+      working-directory: ${{runner.workspace}}/build
       run: |
-        ${{runner.workspace}}/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}}
+        ${{runner.workspace}}/SNES-Dev/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}}
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        make -j4
   cross:
     runs-on: ubuntu-20.04
     strategy:
@@ -44,7 +48,11 @@ jobs:
       run: |
           mkdir -pv ${{runner.workspace}}/build
     - name: Configure
-      working-directory: 
+      working-directory: ${{runner.workspace}}/build
       run: |
-        ${{runner.workspace}}/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}} --host ${{matrix.host}}
+        ${{runner.workspace}}/SNES-Dev/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}} --host ${{matrix.host}}
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        make -j4
     
