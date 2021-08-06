@@ -26,7 +26,7 @@ jobs:
     - name: Configure
       working-directory: ${{runner.workspace}}/build
       run: |
-        ${{runner.workspace}}/SNES-Dev/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}}
+        ../SNES-Dev/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}}
     - name: Build
       working-directory: ${{runner.workspace}}/build
       run: |
@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
           target: [w65-snes-elf, w65-elf]
-          host: [aarch64-linux-gnu, alpha-linux-gnu, arm-linux-gnueabi, i686-linux-gnu, mips-linux-gnu, mips64-linux-gnuabi64, m68k-linux-gnu]
+          host: [aarch64-linux-gnu, arm-linux-gnueabi, i686-linux-gnu, mips-linux-gnu, mips64-linux-gnuabi64]
     steps:
     - name: Checkout
       uses: actions/checkout@v2.3.0
@@ -50,7 +50,7 @@ jobs:
     - name: Configure
       working-directory: ${{runner.workspace}}/build
       run: |
-        ${{runner.workspace}}/SNES-Dev/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}} --host ${{matrix.host}}
+        ../SNES-Dev/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}} --host ${{matrix.host}}
     - name: Build
       working-directory: ${{runner.workspace}}/build
       run: |
