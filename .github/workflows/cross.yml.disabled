@@ -8,27 +8,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  native:
+  cross:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
           target: [w65-snes-elf]
+          host: [aarch64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-unkn-linux-gnu]
     steps:
     - name: Checkout
       uses: actions/checkout@v2.3.0
       with:
         submodules: true 
     - name: Install Toolchain
-      run: sudo apt install gcc g++
+      run: sudo apt install gcc g++ gcc-${{matrix.host}} g++-${{matrix.host}}
+    - name: Update rust
+      run: |
+        rustup toolchain add ${{matrix.host}}
+        rustup update
     - name: Setup
       run: |
           mkdir -pv ${{runner.workspace}}/build
     - name: Configure
       working-directory: ${{runner.workspace}}/build
       run: |
-        ../SNES-Dev/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}}
+        ../SNES-Dev/configure --prefix ${{runner.workspace}}/.ciprefix --target ${{matrix.target}} --host ${{matrix.host}}
     - name: Build
       working-directory: ${{runner.workspace}}/build
       run: |
         make -j4
-    
