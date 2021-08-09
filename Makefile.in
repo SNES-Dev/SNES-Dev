@@ -295,7 +295,7 @@ configure-@build_noncanonical@-binutils-gdb:
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(BUILD_DEFS); \
 	cd @build_noncanonical@-binutils-gdb || exit 1; \
-	$(SHELL) @abs_srcdir@/binutils-gdb/configure --srcdir=../$(srcdir)/binutils-gdb $(BUILD_CONFIGURE_OPTS) --with-sysroot=$(sysroot)
+	$(SHELL) @abs_srcdir@/binutils-gdb/configure --srcdir=../$(srcdir)/binutils-gdb $(BUILD_CONFIGURE_OPTS) --with-sysroot=$(sysroot) --enable-gdb=@enable_gdb@
 
 
 
@@ -405,7 +405,7 @@ configure-binutils-gdb:
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(HOST_DEFS); \
 	cd binutils-gdb || exit 1; \
-	$(SHELL) @abs_srcdir@/binutils-gdb/configure --srcdir=../$(srcdir)/binutils-gdb $(HOST_CONFIGURE_OPTS) --with-sysroot=$(sysroot)
+	$(SHELL) @abs_srcdir@/binutils-gdb/configure --srcdir=../$(srcdir)/binutils-gdb $(HOST_CONFIGURE_OPTS) --with-sysroot=$(sysroot)  --enable-gdb=@enable_gdb@
 
 
 

@@ -1,10 +1,10 @@
 #! /usr/bin/autogen
 AutoGen definitions Makefile.tpl;
 
-build_modules={module="binutils-gdb"; extra_configure_flags="--with-sysroot=$(sysroot)";};
+build_modules={module="binutils-gdb"; extra_configure_flags="--with-sysroot=$(sysroot) --enable-gdb=@enable_gdb@";};
 build_modules={module="gcc"; extra_configure_flags="--with-sysroot=$(sysroot) --without-headers --with-newlib --disable-libstdcxx --disable-libvtv --disable-libssp --disable-libgomp --enable-languages=$(languages) --enable-shared=$(gcc_shared)"; };
 
-host_modules={module="binutils-gdb"; extra_configure_flags="--with-sysroot=$(sysroot)";};
+host_modules={module="binutils-gdb"; extra_configure_flags="--with-sysroot=$(sysroot)  --enable-gdb=@enable_gdb@";};
 host_modules={module="gcc"; extra_configure_flags="--with-sysroot=$(sysroot) --without-headers --with-newlib --disable-libstdcxx --disable-libvtv --disable-libssp --disable-libgomp --enable-languages=$(languages) --enable-shared=$(gcc_shared)"; };
 
 target_modules={module="qc"; extra_configure_flags="--enable-float=@float_support@ --enable-int128=@int128_support@";};

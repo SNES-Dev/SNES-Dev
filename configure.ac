@@ -195,6 +195,12 @@ AC_ARG_ENABLE([binutils],[
     fi
 ])
 
+AC_ARG_ENABLE([gdb],[Control whether gdb is built with binutils],[
+    enable_gdb=$enableval
+],[
+    enable_gdb=yes
+])
+
 AC_ARG_ENABLE([gcc],[
     Build gcc and use it's tools to build libraries
 ],[
@@ -231,6 +237,7 @@ AC_ARG_ENABLE([qc],[
 AC_SUBST([build_dirs])
 AC_SUBST([host_dirs])
 AC_SUBST([target_dirs])
+AC_SUBST([enable_gdb])
 AC_SUBST([int128_support])
 AC_SUBST([float_support])
 

@@ -586,6 +586,7 @@ ac_subst_vars='LTLIBOBJS
 LIBOBJS
 float_support
 int128_support
+enable_gdb
 target_dirs
 host_dirs
 build_dirs
@@ -714,6 +715,7 @@ with_sysroot
 enable_float
 enable_int128
 enable_binutils
+enable_gdb
 enable_gcc
 enable_qc
 '
@@ -1376,6 +1378,7 @@ Optional Features:
 
     Build gnu binutils and use it's tools to build libraries
 
+Control whether gdb is built with binutils
 
     Build gcc and use it's tools to build libraries
 
@@ -6173,6 +6176,18 @@ else
 fi
 
 
+# Check whether --enable-gdb was given.
+if test "${enable_gdb+set}" = set; then :
+  enableval=$enable_gdb;
+    enable_gdb=$enableval
+
+else
+
+    enable_gdb=yes
+
+fi
+
+
 # Check whether --enable-gcc was given.
 if test "${enable_gcc+set}" = set; then :
   enableval=$enable_gcc;
@@ -6208,6 +6223,7 @@ else
     target_dirs="$target_dirs qc"
 
 fi
+
 
 
 
