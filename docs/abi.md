@@ -53,6 +53,7 @@ The type float shall be represented as an IEEE 754 binary single precision float
 
 Atomic operations of size 16 or 8 shall be treated as always lock free. Other sizes of atomics are never treated as lock free. Accessing an non-lock free atomic from an interrupt handler other than BRK or COP has undefined behaviour if the interrupt handler interrupts any non-lock free atomic operation.
 
+As a suggested extension, implementations are recommended to implement non-lock free atomics such that the IRQ handler may additionally access non-lock free atomics as though they were lock free. Implementations are recommended to document when this is the case.
 
 ## Extended (in-memory) Registers
 
@@ -154,7 +155,7 @@ Pointer to Member Functions do not use the least significant bit to differentiat
 
 This section applies to all rust implementations that conform to this abi.
 
-The extern"C" and extern"system" abis are equivalent to the C Calling Convention documented above. The extern"platform-intrinsic" abi is reserved for future extensions, but should otherwise be treated as equivalent. Rust implementations shall define the extern"w65-interrupt" abi, to correspond to the Interrupt Calling Convention defined above. All other abis are not specified by this document and excluding the extern"Rust", extern"rust-call", and extern"rust-intrinsic" abi, programs that conform to this ABI shall not use such abis. This ABI imposes no requirements that implementations forbid those abis.
+The extern"C" and extern"system" abis are equivalent to the C Calling Convention documented above. The extern"platform-intrinsic" abi is reserved for future extensions, but should otherwise be treated as equivalent. Rust implementations shall define the extern"w65-interrupt" abi, to correspond to the Interrupt Calling Convention defined above. All other abis are not specified by this document and excluding the extern"Rust", extern"rust-call", and extern"rust-intrinsic" abi, programs that conform to this ABI shall not use such abis. This ABI imposes no requirements that implementations forbid or diagnose the use of such abis.
 
 
 #### LCRust Versioned ABI
@@ -405,6 +406,8 @@ The following symbols are reserved for generating code handling integer, floatin
 * __float_cvtint32tof128
 * __float_cvtint64tof128
 * __float_cvtint128tof128
+* __inc_r*n* where n is a positive decimal integer
+* __dec_r*n* where n is a positive decimal integer
 
 
 #### Atomic Operations
