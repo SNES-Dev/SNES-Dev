@@ -219,6 +219,14 @@ AC_ARG_ENABLE([gcc],[
     
 ])
 
+AC_ARG_ENABLE([gcc-languages],[
+    Languages to build gcc support for (defaults to c and c++)
+],[
+    languages=$enableval
+],[
+    languages=c,c++
+])
+
 
 AC_ARG_ENABLE([qc],[
     Build qc extended arithmetic library
@@ -237,6 +245,7 @@ AC_ARG_ENABLE([qc],[
 AC_SUBST([build_dirs])
 AC_SUBST([host_dirs])
 AC_SUBST([target_dirs])
+AC_SUBST([languages])
 AC_SUBST([enable_gdb])
 AC_SUBST([int128_support])
 AC_SUBST([float_support])

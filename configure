@@ -587,6 +587,7 @@ LIBOBJS
 float_support
 int128_support
 enable_gdb
+languages
 target_dirs
 host_dirs
 build_dirs
@@ -717,6 +718,7 @@ enable_int128
 enable_binutils
 enable_gdb
 enable_gcc
+enable_gcc_languages
 enable_qc
 '
       ac_precious_vars='build_alias
@@ -1381,6 +1383,9 @@ Optional Features:
 Control whether gdb is built with binutils
 
     Build gcc and use it's tools to build libraries
+
+
+    Languages to build gcc support for (defaults to c and c++)
 
 
     Build qc extended arithmetic library
@@ -6206,6 +6211,18 @@ if test "${enable_gcc+set}" = set; then :
 fi
 
 
+# Check whether --enable-gcc-languages was given.
+if test "${enable_gcc_languages+set}" = set; then :
+  enableval=$enable_gcc_languages;
+    languages=$enableval
+
+else
+
+    languages=c,c++
+
+fi
+
+
 
 # Check whether --enable-qc was given.
 if test "${enable_qc+set}" = set; then :
@@ -6223,6 +6240,7 @@ else
     target_dirs="$target_dirs qc"
 
 fi
+
 
 
 

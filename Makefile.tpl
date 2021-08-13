@@ -99,6 +99,7 @@ BUILD_DIRS = @build_dirs@
 HOST_DIRS = @host_dirs@
 TARGET_DIRS = @target_dirs@
 
+languages = @languages@
 
 BASE_DEFS = INSTALL="$(INSTALL)"; export INSTALL; \
 			INSTALL_PROGRAM="$(INSTALL_PROGRAM)"; export INSTALL_PROGRAM; \
