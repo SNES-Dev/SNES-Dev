@@ -208,12 +208,25 @@ HOST_CONFIGURE_OPTS = --prefix $(prefix) --exec-prefix $(exec_prefix) \
 						--sysconfdir $(sysconfdir) --sharedstatedir $(sharedstatedir) \
 						--localstatedir $(localstatedir) 
 
+HOST_EXTRA_TARGETS_CONFIGURE_OPTS = --prefix $(prefix) --exec-prefix $(exec_prefix) \
+						--bindir $(bindir) --sbindir $(sbindir) \
+						--libexecdir $(libexecdir) --libdir $(libdir) \
+						--includedir $(includedir) --datarootdir $(datarootdir) \
+						--datadir $(datadir) --docdir $(docdir) \
+						--dvidir $(dvidir) --htmldir $(htmldir) \
+						--pdfdir $(pdfdir) --mandir $(mandir) \
+						--infodir $(infodir) --localedir $(localedir) \
+						--sysconfdir $(sysconfdir) --sharedstatedir $(sharedstatedir) \
+						--localstatedir $(localstatedir) 
+
 ifneq (,@build_alias@)
 	HOST_CONFIGURE_OPTS += --build $(build_alias)
+	HOST_EXTRA_TARGETS_CONFIGURE_OPTS += --build $(build_alias)
 endif 
 
 ifneq (,@host_alias@)
 	HOST_CONFIGURE_OPTS += --host $(host_alias)
+	HOST_EXTRA_TARGETS_CONFIGURE_OPTS += --host $(host_alias)
 endif 
 
 ifneq (,@target_alias@)
@@ -252,6 +265,7 @@ ifneq (,@target_alias@)
 	TARGET_CONFIGURE_OPTS += --host ${target_alias}
 endif
 
+extra_binutils_targets = @extra_binutils_targets@
 
 # Global Targets
 
@@ -312,7 +326,7 @@ configure-[+prefix+][+module+]:
 [+prefix+][+module+]/Makefile: [+prefix+][+module+]/config.status $(srcdir)/[+module+]/Makefile.in
 	@[+exports+]
 	cd [+prefix+][+module+]; ./config.status Makefile
-
++][+
 [+prefix+][+module+]/clean:
 	+@[+exports+]
 	$(MAKE) -C [+prefix+][+module+] clean
@@ -351,10 +365,18 @@ endif
 [+ targs exports="$(HOST_DEFS)" +]
 [+ ENDFOR +]
 
+[+ FOR extra_target_modules +]
+[+ configure exports="$(HOST_DEFS)" configure_flags="$(HOST_EXTRA_TARGETS_CONFIGURE_OPTS) --target $*" prefix="targ-%-" +]
+[+ targs exports="$(BUILD_DEFS)" prefix="targ-%-" +]prefix
+[+ ENDFOR +]
+
 stage1: stage0
 ifneq (,$(HOST_DIRS))
 	+$(MAKE) $(HOST_DIRS:%=%/all)
 endif
+[+ FOR extra_target_modules +]
+	+$(MAKE) $([+module_targets+]:%=targ-%-[+module+]/all)
+[+ ENDFOR +]
 
 # stage2 targets (target)
 
@@ -367,3 +389,5 @@ endif
 [+ configure exports="${TARGET_DEFS}"  configure_flags="$(TARGET_CONFIGURE_OPTS)" +]
 [+ targs exports="$(TARGET_DEFS)" +]
 [+ ENDFOR +]
+
+

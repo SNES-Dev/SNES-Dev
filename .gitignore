@@ -2,3 +2,4 @@
 cmake-build-*/
 build*/
 autom4te.cache/
+target/

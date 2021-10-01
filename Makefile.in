@@ -205,12 +205,25 @@ HOST_CONFIGURE_OPTS = --prefix $(prefix) --exec-prefix $(exec_prefix) \
 						--sysconfdir $(sysconfdir) --sharedstatedir $(sharedstatedir) \
 						--localstatedir $(localstatedir) 
 
+HOST_EXTRA_TARGETS_CONFIGURE_OPTS = --prefix $(prefix) --exec-prefix $(exec_prefix) \
+						--bindir $(bindir) --sbindir $(sbindir) \
+						--libexecdir $(libexecdir) --libdir $(libdir) \
+						--includedir $(includedir) --datarootdir $(datarootdir) \
+						--datadir $(datadir) --docdir $(docdir) \
+						--dvidir $(dvidir) --htmldir $(htmldir) \
+						--pdfdir $(pdfdir) --mandir $(mandir) \
+						--infodir $(infodir) --localedir $(localedir) \
+						--sysconfdir $(sysconfdir) --sharedstatedir $(sharedstatedir) \
+						--localstatedir $(localstatedir) 
+
 ifneq (,@build_alias@)
 	HOST_CONFIGURE_OPTS += --build $(build_alias)
+	HOST_EXTRA_TARGETS_CONFIGURE_OPTS += --build $(build_alias)
 endif 
 
 ifneq (,@host_alias@)
 	HOST_CONFIGURE_OPTS += --host $(host_alias)
+	HOST_EXTRA_TARGETS_CONFIGURE_OPTS += --host $(host_alias)
 endif 
 
 ifneq (,@target_alias@)
@@ -249,6 +262,7 @@ ifneq (,@target_alias@)
 	TARGET_CONFIGURE_OPTS += --host ${target_alias}
 endif
 
+extra_binutils_targets = @extra_binutils_targets@
 
 # Global Targets
 
@@ -504,10 +518,123 @@ gcc/install-strip:
 
 
 
+
+
+
+.PHONY: configure-targ-%-binutils-gdb
+
+configure-targ-%-binutils-gdb: 
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_DEFS); \
+	cd targ-%-binutils-gdb || exit 1; \
+	$(SHELL) @abs_srcdir@/binutils-gdb/configure --srcdir=../$(srcdir)/binutils-gdb $(HOST_EXTRA_TARGETS_CONFIGURE_OPTS) --target $* --with-sysroot=$(sysroot)  --enable-gdb=@enable_gdb@
+
+
+
+
+.PHONY: targ-%-binutils-gdb/all targ-%-binutils-gdb/clean targ-%-binutils-gdb/check targ-%-binutils-gdb/install targ-%-binutils-gdb/install-strip 
+
+.PRECIOUS: targ-%-binutils-gdb/config.sub
+
+targ-%-binutils-gdb/all: targ-%-binutils-gdb/
+	+@$(BUILD_DEFS)
+	$(MAKE) -C targ-%-binutils-gdb all
+
+targ-%-binutils-gdb/:
+	+@$(BUILD_DEFS)
+	$(MKDIR_P) targ-%-binutils-gdb/
+	$(MAKE) configure-targ-%-binutils-gdb
+
+targ-%-binutils-gdb/config.status: targ-%-binutils-gdb/
+	@$(BUILD_DEFS)
+	cd targ-%-binutils-gdb; ./config.status --recheck
+
+targ-%-binutils-gdb/Makefile: targ-%-binutils-gdb/config.status $(srcdir)/binutils-gdb/Makefile.in
+	@$(BUILD_DEFS)
+	cd targ-%-binutils-gdb; ./config.status Makefile
+
+targ-%-binutils-gdb/clean:
+	+@$(BUILD_DEFS)
+	$(MAKE) -C targ-%-binutils-gdb clean
+
+targ-%-binutils-gdb/check:
+	+@$(BUILD_DEFS)
+	$(MAKE) -C targ-%-binutils-gdb check
+
+targ-%-binutils-gdb/install:
+	+@$(BUILD_DEFS)
+	$(MAKE) -C targ-%-binutils-gdb install
+
+targ-%-binutils-gdb/install-strip:
+	+@$(BUILD_DEFS); $(MAKE) -C targ-%-binutils-gdb install-strip
+
+
+
+
+
+
+.PHONY: configure-targ-%-gcc
+
+configure-targ-%-gcc: 
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_DEFS); \
+	cd targ-%-gcc || exit 1; \
+	$(SHELL) @abs_srcdir@/gcc/configure --srcdir=../$(srcdir)/gcc $(HOST_EXTRA_TARGETS_CONFIGURE_OPTS) --target $* --with-sysroot=$(sysroot) --without-headers --with-newlib --disable-libstdcxx --disable-libvtv --disable-libssp --disable-libgomp --enable-languages=$(languages) --enable-shared=$(gcc_shared)
+
+
+
+
+.PHONY: targ-%-gcc/all targ-%-gcc/clean targ-%-gcc/check targ-%-gcc/install targ-%-gcc/install-strip 
+
+.PRECIOUS: targ-%-gcc/config.sub
+
+targ-%-gcc/all: targ-%-gcc/
+	+@$(BUILD_DEFS)
+	$(MAKE) -C targ-%-gcc all
+
+targ-%-gcc/:
+	+@$(BUILD_DEFS)
+	$(MKDIR_P) targ-%-gcc/
+	$(MAKE) configure-targ-%-gcc
+
+targ-%-gcc/config.status: targ-%-gcc/
+	@$(BUILD_DEFS)
+	cd targ-%-gcc; ./config.status --recheck
+
+targ-%-gcc/Makefile: targ-%-gcc/config.status $(srcdir)/gcc/Makefile.in
+	@$(BUILD_DEFS)
+	cd targ-%-gcc; ./config.status Makefile
+
+targ-%-gcc/clean:
+	+@$(BUILD_DEFS)
+	$(MAKE) -C targ-%-gcc clean
+
+targ-%-gcc/check:
+	+@$(BUILD_DEFS)
+	$(MAKE) -C targ-%-gcc check
+
+targ-%-gcc/install:
+	+@$(BUILD_DEFS)
+	$(MAKE) -C targ-%-gcc install
+
+targ-%-gcc/install-strip:
+	+@$(BUILD_DEFS); $(MAKE) -C targ-%-gcc install-strip
+
+
+
+
+
 stage1: stage0
 ifneq (,$(HOST_DIRS))
 	+$(MAKE) $(HOST_DIRS:%=%/all)
 endif
+
+	+$(MAKE) $(extra_binutils_targets:%=targ-%-binutils-gdb/all)
+
+	+$(MAKE) $(extra_gcc_targets:%=targ-%-gcc/all)
+
 
 # stage2 targets (target)
 
@@ -566,6 +693,8 @@ qc/install:
 
 qc/install-strip:
 	+@$(TARGET_DEFS); $(MAKE) -C qc install-strip
+
+
 
 
 

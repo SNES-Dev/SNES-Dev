@@ -1,5 +1,8 @@
 #![no_std]
 #![no_builtins]
 
-#[cfg(not(any(doc, target_arch = "w65")))]
-core::compile_error!("Cannot compile except for the w65 architecture");
+#[cfg(any(target_feature = "float", target_feature = "hardfp", feature = "f16"))]
+mod fp16;
+
+#[cfg(any(target_feature = "float", target_feature = "hardfp", feature = "f16"))]
+pub use fp16::f16;

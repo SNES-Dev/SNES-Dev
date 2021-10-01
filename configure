@@ -584,6 +584,7 @@ PACKAGE_URL=
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+extra_binutils_targets
 float_support
 int128_support
 enable_gdb
@@ -720,6 +721,7 @@ enable_gdb
 enable_gcc
 enable_gcc_languages
 enable_qc
+with_extra_binutils_targets
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1396,6 +1398,9 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
 
     Set the sysroot to for binutils and gcc, and also the installation prefix for libraries
+
+
+    Additional targets to build for bintutils
 
 
 Some influential environment variables:
@@ -6240,6 +6245,24 @@ else
     target_dirs="$target_dirs qc"
 
 fi
+
+
+
+# Check whether --with-extra-binutils-targets was given.
+if test "${with_extra_binutils_targets+set}" = set; then :
+  withval=$with_extra_binutils_targets;
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Input to --extra-binutils-targets=$withval" >&5
+$as_echo "$as_me: Input to --extra-binutils-targets=$withval" >&6;}
+    while IFS="," read val
+    do
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Adding binutils target $val" >&5
+$as_echo "$as_me: Adding binutils target $val" >&6;}
+    extra_binutils_targets="$extra_binutils_targets $val"
+    done <<< "$withval"
+
+
+fi
+
 
 
 

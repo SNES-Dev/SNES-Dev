@@ -1,0 +1,2 @@
+[workspace]
+members = ["w65-abi-extra","rust-api"]

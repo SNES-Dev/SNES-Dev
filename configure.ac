@@ -242,6 +242,16 @@ AC_ARG_ENABLE([qc],[
     target_dirs="$target_dirs qc"
 ])
 
+AC_ARG_WITH([extra-binutils-targets],[
+    Additional targets to build for bintutils
+],[
+    while IFS="," read val
+    do
+    extra_binutils_targets="$extra_binutils_targets $val"
+    done <<< "$withval"
+
+])
+
 AC_SUBST([build_dirs])
 AC_SUBST([host_dirs])
 AC_SUBST([target_dirs])
@@ -249,6 +259,7 @@ AC_SUBST([languages])
 AC_SUBST([enable_gdb])
 AC_SUBST([int128_support])
 AC_SUBST([float_support])
+AC_SUBST([extra_binutils_targets])
 
 
 AC_CONFIG_FILES([Makefile])
