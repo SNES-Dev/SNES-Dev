@@ -7,3 +7,6 @@
 [submodule "gcc"]
 	path = gcc
 	url = https://github.com/SNES-Dev/gcc.git
+[submodule "docs/abi"]
+	path = docs/abi
+	url = https://github.com/SNES-Dev/abi.git
