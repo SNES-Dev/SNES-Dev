@@ -1,7 +1,7 @@
 # SNES-Dev
 Library for creating SNES Homebrew in C, C++, and Rust. llvm and gnu toolchains supported
 
-If you wish to discuss this project, you can join the Discord Server: <https://discord.gg/2T6ZUeRJPu>
+If you wish to discuss this project, you can join the lccc Discord Server: <https://discord.gg/a8caHpGcx2>
 
 ## License
 
